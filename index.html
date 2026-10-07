@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+  <title>Inclusia · Prompts per a l'educació inclusiva</title>
+  <meta name="description" content="Col·lecció de prompts d'IA per crear i adaptar materials educatius per a TEA, TDAH, dislèxia, alumnat nouvingut i altres perfils. Gratuïta, sense registre i amb les dades al teu navegador.">
+  <meta name="theme-color" content="#0f6e66">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script type="module" src="assets/js/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Salta al contingut</a>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="./" aria-label="Inclusia, inici">
+        <svg class="brand__logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="currentColor"/><circle cx="16" cy="9" r="3" fill="#fff"/><rect x="13" y="14" width="6" height="11" rx="3" fill="#fff"/><circle cx="7.5" cy="20" r="2" fill="#fff" opacity=".7"/><rect x="22.5" y="18" width="4" height="4" rx="1" fill="#fff" opacity=".7"/></svg>
+        <span class="brand__name">Inclusia</span>
+      </a>
+
+      <nav class="tabs" aria-label="Seccions">
+        <button class="tabs__btn" type="button" data-view="library" aria-current="page">Biblioteca</button>
+        <button class="tabs__btn" type="button" data-view="builder">Generador</button>
+      </nav>
+
+      <div class="topbar__actions">
+        <button class="btn btn--primary" type="button" data-action="new-prompt" aria-label="Nou prompt">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="hide-sm">Nou prompt</span>
+        </button>
+        <div class="menu">
+          <button class="btn btn--ghost btn--icon" type="button" id="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-list" title="Més opcions">
+            <svg class="icon icon--fill" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            <span class="sr-only">Més opcions</span>
+          </button>
+          <ul class="menu__list" id="menu-list" role="menu" hidden>
+            <li role="none"><button role="menuitem" type="button" data-action="export">Exporta les meves dades (.json)</button></li>
+            <li role="none"><button role="menuitem" type="button" data-action="import">Importa dades (.json)</button></li>
+            <li role="none"><button role="menuitem" type="button" data-action="theme">Tema: <span data-theme-label>automàtic</span></button></li>
+            <li role="none"><button role="menuitem" type="button" data-action="about">Com funciona</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ───────── BIBLIOTECA ───────── -->
+    <section id="view-library" class="view" aria-labelledby="library-title">
+      <div class="intro">
+        <h1 id="library-title">Prompts per adaptar i crear materials inclusius</h1>
+        <p>Tria, omple els camps i copia. Enganxa el prompt a la teva IA amb el material adjunt.</p>
+        <div class="search">
+          <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <label class="sr-only" for="search">Cerca prompts</label>
+          <input id="search" type="search" placeholder="Cerca: examen, pictogrames, lectura fàcil…" autocomplete="off" enterkeyhint="search">
+          <kbd class="search__kbd hide-sm" aria-hidden="true">/</kbd>
+        </div>
+      </div>
+
+      <div class="library">
+        <details class="filters" id="filters" open>
+          <summary class="filters__summary">
+            <span>Filtres</span>
+            <span class="badge" id="filters-count" hidden></span>
+          </summary>
+          <div class="filters__body">
+            <fieldset class="filter-group filter-group--toggles">
+              <legend class="sr-only">Col·lecció</legend>
+              <label class="switch"><input type="checkbox" id="only-favorites"><span>Només preferits</span></label>
+              <label class="switch"><input type="checkbox" id="only-mine"><span>Només els meus</span></label>
+            </fieldset>
+            <div id="facet-groups"></div>
+            <button class="btn btn--link" type="button" id="clear-filters">Neteja els filtres</button>
+          </div>
+        </details>
+
+        <div class="results">
+          <div class="results__bar">
+            <p class="results__count" id="results-count" aria-live="polite"></p>
+            <label class="sort">
+              <span>Ordena</span>
+              <select id="sort">
+                <option value="default">Recomanat</option>
+                <option value="popular">Més copiats</option>
+                <option value="alpha">A-Z</option>
+                <option value="recent">Els meus, més recents</option>
+              </select>
+            </label>
+          </div>
+          <ul class="cards" id="cards" aria-label="Prompts"></ul>
+          <div class="empty" id="empty" hidden>
+            <p><strong>No hi ha cap prompt amb aquests filtres.</strong></p>
+            <p>Prova de treure'n algun o crea'n un amb el <button class="btn btn--link" type="button" data-view="builder">generador</button>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── GENERADOR ───────── -->
+    <section id="view-builder" class="view" aria-labelledby="builder-title" hidden>
+      <div class="intro">
+        <h1 id="builder-title">Generador de prompts</h1>
+        <p>Combina perfils, format i opcions. El prompt es construeix sol mentre tries.</p>
+      </div>
+
+      <div class="builder">
+        <form class="builder__form panel" id="builder-form" autocomplete="off">
+          <fieldset class="field">
+            <legend>Què vols fer</legend>
+            <div class="segmented" id="b-action"></div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Perfil de l'alumnat <span class="hint">(pots triar-ne més d'un)</span></legend>
+            <div class="chips" id="b-profiles"></div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Format</legend>
+            <div class="chips" id="b-format"></div>
+          </fieldset>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="b-stage">Etapa</label>
+              <input id="b-stage" list="b-stage-list" placeholder="Ex.: 2n d'ESO">
+              <datalist id="b-stage-list"></datalist>
+            </div>
+            <div class="field">
+              <label for="b-area">Àrea</label>
+              <input id="b-area" placeholder="Ex.: Ciències naturals">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="b-topic">Tema <span class="hint">(opcional)</span></label>
+            <input id="b-topic" placeholder="Ex.: La cèl·lula">
+          </div>
+
+          <fieldset class="field">
+            <legend>Opcions</legend>
+            <div class="chips" id="b-extras"></div>
+          </fieldset>
+
+          <div class="field">
+            <label for="b-notes">Indicació extra <span class="hint">(opcional)</span></label>
+            <input id="b-notes" placeholder="Ex.: Contextualitza els exemples amb el futbol">
+          </div>
+        </form>
+
+        <div class="builder__output panel">
+          <div class="output__head">
+            <h2>Prompt generat</h2>
+            <span class="muted small" id="b-words"></span>
+          </div>
+          <pre class="prompt-text" id="b-output" tabindex="0" aria-live="off"></pre>
+          <div class="actions">
+            <button class="btn btn--primary btn--lg" type="button" id="b-copy">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+              Copia el prompt
+            </button>
+            <button class="btn" type="button" id="b-save">Desa'l als meus</button>
+            <button class="btn btn--ghost" type="button" id="b-reset">Reinicia</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Els teus prompts es desen només en aquest navegador. Fes-ne una còpia amb <button class="btn btn--link" type="button" data-action="export">Exporta</button>.</p>
+    <p>Revisa sempre el resultat de la IA abans de fer-lo servir amb l'alumnat i no hi introdueixis dades personals.</p>
+    <p><a href="https://github.com/vmoren12/inclusia">Codi a GitHub</a> · Pictogrames suggerits: <a href="https://arasaac.org" rel="noopener">ARASAAC</a></p>
+  </footer>
+
+  <!-- ───────── DIÀLEG: VEURE / OMPLIR / COPIAR ───────── -->
+  <dialog class="dialog" id="dlg-view" aria-labelledby="view-title">
+    <div class="dialog__inner">
+      <header class="dialog__head">
+        <div>
+          <h2 id="view-title"></h2>
+          <p class="muted" id="view-desc"></p>
+          <div class="tags" id="view-tags"></div>
+        </div>
+        <button class="btn btn--ghost btn--icon" type="button" data-close title="Tanca">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          <span class="sr-only">Tanca</span>
+        </button>
+      </header>
+
+      <div class="dialog__body">
+        <details class="fill" id="view-fill">
+          <summary><span id="view-fill-title">Omple els camps</span> <span class="hint">(opcional: també els pots omplir a la IA)</span></summary>
+          <div class="fill__grid" id="view-fields"></div>
+          <button class="btn btn--link" type="button" id="view-clear-fields">Buida els camps</button>
+        </details>
+        <pre class="prompt-text" id="view-text" tabindex="0"></pre>
+      </div>
+
+      <footer class="dialog__foot">
+        <button class="btn btn--primary btn--lg" type="button" id="view-copy">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+          Copia
+        </button>
+        <button class="btn btn--icon fav" type="button" id="view-fav" aria-pressed="false" title="Preferit">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>
+          <span class="sr-only">Preferit</span>
+        </button>
+        <button class="btn" type="button" id="view-edit">Edita</button>
+        <button class="btn" type="button" id="view-duplicate">Duplica</button>
+        <button class="btn btn--ghost" type="button" id="view-download">Descarrega .txt</button>
+        <button class="btn btn--ghost" type="button" id="view-restore" hidden>Restaura l'original</button>
+        <button class="btn btn--danger" type="button" id="view-delete" hidden>Elimina</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ───────── DIÀLEG: EDITAR ───────── -->
+  <dialog class="dialog" id="dlg-edit" aria-labelledby="edit-title">
+    <form class="dialog__inner" id="edit-form" method="dialog" novalidate>
+      <header class="dialog__head">
+        <div>
+          <h2 id="edit-title">Nou prompt</h2>
+          <p class="muted" id="edit-note"></p>
+        </div>
+        <button class="btn btn--ghost btn--icon" type="button" data-close title="Tanca">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          <span class="sr-only">Tanca</span>
+        </button>
+      </header>
+      <div class="dialog__body">
+        <div class="field">
+          <label for="edit-name">Títol</label>
+          <input id="edit-name" name="title" required maxlength="200">
+        </div>
+        <div class="field">
+          <label for="edit-description">Descripció breu <span class="hint">(opcional)</span></label>
+          <input id="edit-description" name="description" maxlength="500">
+        </div>
+        <div class="field">
+          <label for="edit-text">Prompt</label>
+          <p class="hint" id="edit-text-hint">Escriu entre [claudàtors] els camps a omplir. Per oferir opcions, separa-les amb « / »: [llatí / no llatí].</p>
+          <textarea id="edit-text" name="text" rows="14" required aria-describedby="edit-text-hint" spellcheck="true"></textarea>
+        </div>
+        <div id="edit-facets"></div>
+        <p class="form-error" id="edit-error" role="alert" hidden></p>
+      </div>
+      <footer class="dialog__foot">
+        <button class="btn btn--primary btn--lg" type="submit" value="save">Desa</button>
+        <button class="btn btn--ghost" type="button" data-close>Cancel·la</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ───────── DIÀLEG: IMPORTAR ───────── -->
+  <dialog class="dialog dialog--sm" id="dlg-import" aria-labelledby="import-title">
+    <form class="dialog__inner" method="dialog">
+      <header class="dialog__head">
+        <h2 id="import-title">Importa dades</h2>
+      </header>
+      <div class="dialog__body">
+        <p id="import-summary"></p>
+        <fieldset class="field">
+          <legend>Com vols importar-les?</legend>
+          <label class="radio"><input type="radio" name="import-mode" value="merge" checked><span><strong>Afegeix</strong> als meus prompts (recomanat)</span></label>
+          <label class="radio"><input type="radio" name="import-mode" value="replace"><span><strong>Substitueix</strong> tots els meus prompts i preferits</span></label>
+        </fieldset>
+      </div>
+      <footer class="dialog__foot">
+        <button class="btn btn--primary" type="submit" value="ok">Importa</button>
+        <button class="btn btn--ghost" type="submit" value="cancel">Cancel·la</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ───────── DIÀLEG: COM FUNCIONA ───────── -->
+  <dialog class="dialog dialog--sm" id="dlg-about" aria-labelledby="about-title">
+    <div class="dialog__inner">
+      <header class="dialog__head">
+        <h2 id="about-title">Com funciona</h2>
+        <button class="btn btn--ghost btn--icon" type="button" data-close title="Tanca">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          <span class="sr-only">Tanca</span>
+        </button>
+      </header>
+      <div class="dialog__body prose">
+        <ol>
+          <li><strong>Busca</strong> un prompt a la biblioteca o construeix-ne un al <strong>generador</strong>.</li>
+          <li><strong>Omple</strong> els camps entre [claudàtors], aquí o directament a la IA.</li>
+          <li><strong>Copia</strong> i enganxa'l a la teva IA (ChatGPT, Claude, Gemini, Copilot…) juntament amb el material.</li>
+          <li><strong>Revisa</strong> el resultat: els prompts demanen a la IA que marqui els dubtes amb [?].</li>
+        </ol>
+        <p>Pots <strong>editar</strong> qualsevol prompt, <strong>duplicar-lo</strong> o crear-ne de nous. Tot es desa en aquest navegador: exporta les teves dades per fer-ne una còpia o passar-les a un altre dispositiu.</p>
+        <p><strong>Privacitat:</strong> no escriguis mai noms ni dades personals de l'alumnat als prompts.</p>
+        <p class="muted small">Dreceres: <kbd>/</kbd> cerca · <kbd>Esc</kbd> tanca.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="noscript">Inclusia necessita JavaScript per funcionar.</p></noscript>
+</body>
+</html>

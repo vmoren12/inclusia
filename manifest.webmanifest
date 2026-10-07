@@ -1,0 +1,14 @@
+{
+  "name": "Inclusia · Prompts per a l'educació inclusiva",
+  "short_name": "Inclusia",
+  "description": "Prompts d'IA per crear i adaptar materials educatius per a qualsevol perfil d'alumnat.",
+  "lang": "ca",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5f1",
+  "theme_color": "#0f6e66",
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

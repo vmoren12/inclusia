@@ -1,0 +1,15 @@
+{
+  "name": "inclusia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prompts d'IA per crear i adaptar materials educatius inclusius.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes serve -l 8080 .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
