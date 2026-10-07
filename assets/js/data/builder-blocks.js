@@ -1,6 +1,8 @@
 // Blocs per al generador de prompts. Cada perfil i format aporta poques línies,
 // concretes i combinables, perquè el prompt final sigui curt i clar.
 
+import { DIGITAL_TECH, DIGITAL_FEATURES } from './digital.js';
+
 export const BUILDER_ACTIONS = [
   {
     id: 'adaptar',
@@ -29,6 +31,11 @@ export const BUILDER_STAGES = [
 ];
 
 export const BUILDER_FORMATS = {
+  digital: {
+    name: 'material digital interactiu (un sol fitxer HTML)',
+    lines: [DIGITAL_TECH, ...DIGITAL_FEATURES],
+    deliver: 'el codi complet del fitxer HTML (en un sol bloc, sense parts omeses)',
+  },
   text: {
     name: 'text o lectura',
     lines: ['Organitza el text en apartats curts amb títols clars.', 'Afegeix 3-4 preguntes de comprensió.'],
@@ -159,6 +166,12 @@ export const BUILDER_EXTRAS = [
     deliver: 'el glossari',
   },
   { id: 'solucionari', label: 'Solucionari', deliver: 'el solucionari' },
+  {
+    id: 'digital',
+    label: 'Versió digital (HTML)',
+    addon: true,
+    notForFormat: 'digital',
+  },
   { id: 'autoavaluacio', label: 'Autoavaluació', line: 'Afegeix una autoavaluació breu de 3 ítems per a l’alumne.' },
   {
     id: 'imprimir',

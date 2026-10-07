@@ -5,6 +5,7 @@ import { findPlaceholders, fillPlaceholders, tokenize } from './placeholders.js'
 import { loadState, saveState, mergePrompts, upsertPrompt, removePrompt, STORAGE_KEY } from './store.js';
 import { buildExport, parseImport, applyImport } from './io.js';
 import { buildPrompt } from './builder.js';
+import { DIGITAL_FORMAT, DIGITAL_ADDON, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
 
 /* ───────────────────────── Estat ───────────────────────── */
 
@@ -91,7 +92,13 @@ const slug = (s) =>
   normalize(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'prompt';
 
 const isFav = (id) => state.favorites.includes(id);
-const filledText = (p) => fillPlaceholders(p.text, fieldValues);
+// Complement digital (HTML): preferència global, només per als prompts que l'admeten.
+const digitalOn = (p) => state.settings.digital && supportsDigitalAddon(p);
+const promptText = (p) => (digitalOn(p) ? withDigitalAddon(p.text) : p.text);
+// Els prompts que admeten el complement també apareixen al filtre de format digital.
+const facetValues = (p, key) =>
+  key === 'formats' && supportsDigitalAddon(p) ? [...p.formats, DIGITAL_FORMAT] : p[key];
+const filledText = (p) => fillPlaceholders(promptText(p), fieldValues);
 const hasFilled = (p) => findPlaceholders(p.text).some((f) => fieldValues[f.key]?.trim());
 
 async function copyPrompt(p, btn) {
@@ -119,7 +126,7 @@ function matches(p, { skipFacet } = {}) {
   for (const { key } of FACETS) {
     if (key === skipFacet) continue;
     const selected = ui.facets[key];
-    if (selected.size && !p[key].some((v) => selected.has(v))) return false;
+    if (selected.size && !facetValues(p, key).some((v) => selected.has(v))) return false;
   }
   if (ui.query) {
     const haystack = normalize(
@@ -129,7 +136,7 @@ function matches(p, { skipFacet } = {}) {
         p.text,
         ...p.actions.map((id) => labelOf(ACTIONS, id)),
         ...p.profiles.map((id) => labelOf(PROFILES, id)),
-        ...p.formats.map((id) => labelOf(FORMATS, id)),
+        ...facetValues(p, 'formats').map((id) => labelOf(FORMATS, id)),
       ].join(' '),
     );
     if (!normalize(ui.query).split(/\s+/).filter(Boolean).every((w) => haystack.includes(w))) return false;
@@ -139,7 +146,11 @@ function matches(p, { skipFacet } = {}) {
 
 function sortList(list) {
   const order = new Map(prompts.map((p, i) => [p.id, i]));
-  const byDefault = (a, b) => (isFav(b.id) - isFav(a.id)) || order.get(a.id) - order.get(b.id);
+  // Amb el filtre digital actiu, primer els prompts digitals específics i després els que admeten el complement.
+  const digitalFirst = ui.facets.formats.has(DIGITAL_FORMAT);
+  const isDigital = (p) => Number(digitalFirst && p.formats.includes(DIGITAL_FORMAT));
+  const byDefault = (a, b) =>
+    isDigital(b) - isDigital(a) || isFav(b.id) - isFav(a.id) || order.get(a.id) - order.get(b.id);
   const sorters = {
     default: byDefault,
     popular: (a, b) => (state.stats[b.id] ?? 0) - (state.stats[a.id] ?? 0) || byDefault(a, b),
@@ -173,7 +184,7 @@ function renderFacets() {
   for (const { key, items } of FACETS) {
     const pool = prompts.filter((p) => matches(p, { skipFacet: key }));
     for (const it of items) {
-      const n = pool.filter((p) => p[key].includes(it.id)).length;
+      const n = pool.filter((p) => facetValues(p, key).includes(it.id)).length;
       const el = $(`[data-count="${key}:${it.id}"]`, root);
       el.textContent = n;
       el.closest('.chip').querySelector('input').checked = ui.facets[key].has(it.id);
@@ -204,9 +215,10 @@ function cardHTML(p) {
     .join('');
   const more = p.profiles.length > maxTags ? `<span class="tag">+${p.profiles.length - maxTags}</span>` : '';
   const fav = isFav(p.id);
+  const digitalTag = p.formats.includes(DIGITAL_FORMAT) ? '<span class="tag tag--digital">HTML interactiu</span>' : '';
   return `
     <li class="card">
-      <div class="card__meta">${actionTags}${sourceTag}</div>
+      <div class="card__meta">${actionTags}${digitalTag}${sourceTag}</div>
       <h3 class="card__title"><button type="button" data-act="open" data-id="${esc(p.id)}">${esc(p.title)}</button></h3>
       ${p.description ? `<p class="card__desc">${esc(p.description)}</p>` : ''}
       <div class="tags">${profileTags}${more}</div>
@@ -256,14 +268,20 @@ function tagsHTML(p) {
   ].join('');
 }
 
-function renderPromptText(target, text) {
-  target.innerHTML = tokenize(text, fieldValues)
-    .map((t) =>
-      t.type === 'text'
-        ? esc(t.value)
-        : `<mark class="ph${t.type === 'filled' ? ' ph--filled' : ''}" title="${esc(t.key)}">${esc(t.value)}</mark>`,
-    )
-    .join('');
+function renderPromptText(target, text, addon = '') {
+  target.innerHTML =
+    tokenize(text, fieldValues)
+      .map((t) =>
+        t.type === 'text'
+          ? esc(t.value)
+          : `<mark class="ph${t.type === 'filled' ? ' ph--filled' : ''}" title="${esc(t.key)}">${esc(t.value)}</mark>`,
+      )
+      .join('') + (addon ? `
+<span class="addon">${esc(addon)}</span>` : '');
+}
+
+function renderViewText() {
+  renderPromptText($('#view-text'), current.text, digitalOn(current) ? DIGITAL_ADDON : '');
 }
 
 function openView(id) {
@@ -289,7 +307,9 @@ function openView(id) {
         ${list}</label>`;
     })
     .join('');
-  renderPromptText($('#view-text'), p.text);
+  $('#view-digital-box').hidden = !supportsDigitalAddon(p);
+  $('#view-digital').checked = state.settings.digital;
+  renderViewText();
 
   const fav = $('#view-fav');
   fav.setAttribute('aria-pressed', String(isFav(p.id)));
@@ -345,6 +365,7 @@ function openEditor(mode, base = {}) {
   $('#edit-text').value = base.text ?? '';
   $('#edit-error').hidden = true;
   renderEditFacets(base);
+  $('#edit-digital').checked = base.digital === true;
   $('#dlg-view').close();
   $('#dlg-edit').showModal();
   $('#edit-name').focus();
@@ -360,6 +381,7 @@ function saveEditor(event) {
     actions: $$('input[name="actions"]:checked', form).map((i) => i.value),
     profiles: $$('input[name="profiles"]:checked', form).map((i) => i.value),
     formats: $$('input[name="formats"]:checked', form).map((i) => i.value),
+    digital: $('#edit-digital').checked,
   };
   if (!data.title.trim() || !data.text.trim()) {
     const err = $('#edit-error');
@@ -435,7 +457,7 @@ function renderBuilderControls() {
     .join('');
   $('#b-extras').innerHTML = BUILDER_EXTRAS.map(
     (e) =>
-      `<label class="chip" data-only="${e.onlyFor ?? ''}"><input type="checkbox" name="b-extras" value="${e.id}"><span>${esc(e.label)}</span></label>`,
+      `<label class="chip" data-only="${e.onlyFor ?? ''}" data-not-format="${e.notForFormat ?? ''}"><input type="checkbox" name="b-extras" value="${e.id}"><span>${esc(e.label)}</span></label>`,
   ).join('');
   $('#b-stage-list').innerHTML = BUILDER_STAGES.map((s) => `<option value="${esc(s)}"></option>`).join('');
 }
@@ -469,8 +491,10 @@ function readBuilderForm() {
 let built = null;
 function renderBuilderOutput() {
   built = buildPrompt(builder);
-  $$('#b-extras [data-only]').forEach((el) => {
-    el.hidden = Boolean(el.dataset.only) && el.dataset.only !== builder.action;
+  $$('#b-extras .chip').forEach((el) => {
+    el.hidden =
+      (Boolean(el.dataset.only) && el.dataset.only !== builder.action) ||
+      el.dataset.notFormat === builder.format;
   });
   renderPromptText($('#b-output'), built.text);
   const words = built.text.split(/\s+/).filter(Boolean).length;
@@ -596,12 +620,17 @@ function bindEvents() {
     const input = e.target.closest('input[data-key]');
     if (!input) return;
     fieldValues[input.dataset.key] = input.value;
-    renderPromptText($('#view-text'), current.text);
+    renderViewText();
   });
   $('#view-clear-fields').addEventListener('click', () => {
     findPlaceholders(current.text).forEach((f) => delete fieldValues[f.key]);
     $$('#view-fields input').forEach((i) => (i.value = ''));
-    renderPromptText($('#view-text'), current.text);
+    renderViewText();
+  });
+  $('#view-digital').addEventListener('change', (e) => {
+    state.settings.digital = e.target.checked;
+    persist();
+    renderViewText();
   });
   $('#view-copy').addEventListener('click', (e) => copyPrompt(current, e.currentTarget));
   $('#view-fav').addEventListener('click', (e) => {

@@ -15,7 +15,7 @@ const VALID = {
 const LIMITS = { title: 200, description: 500, text: 20000 };
 
 export function emptyState() {
-  return { version: SCHEMA_VERSION, prompts: [], favorites: [], stats: {}, settings: { theme: 'auto' } };
+  return { version: SCHEMA_VERSION, prompts: [], favorites: [], stats: {}, settings: { theme: 'auto', digital: false } };
 }
 
 export function createId() {
@@ -45,6 +45,7 @@ export function sanitizePrompt(raw) {
     updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : now,
   };
   if (typeof raw.baseId === 'string' && raw.baseId) prompt.baseId = raw.baseId;
+  if (raw.digital === true) prompt.digital = true;
   return prompt;
 }
 
@@ -71,6 +72,7 @@ export function sanitizeState(raw) {
   if (raw.settings && ['auto', 'light', 'dark'].includes(raw.settings.theme)) {
     state.settings.theme = raw.settings.theme;
   }
+  if (raw.settings?.digital === true) state.settings.digital = true;
   return state;
 }
 

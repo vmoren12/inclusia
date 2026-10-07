@@ -25,6 +25,7 @@ export const PROFILES = [
 ];
 
 export const FORMATS = [
+  { id: 'digital', label: 'Digital interactiu (HTML)' },
   { id: 'text', label: 'Text / lectura' },
   { id: 'fitxa', label: 'Fitxa d’activitats' },
   { id: 'examen', label: 'Examen / prova' },

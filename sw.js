@@ -2,7 +2,7 @@
 // Estratègia "network first": sempre la versió més nova si hi ha xarxa; la memòria cau si no n'hi ha.
 // Incrementa VERSION quan canviï la llista de fitxers.
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `inclusia-${VERSION}`;
 const ASSETS = [
   './',
@@ -15,10 +15,10 @@ const ASSETS = [
   './assets/js/placeholders.js',
   './assets/js/store.js',
   './assets/js/data/builder-blocks.js',
+  './assets/js/data/digital.js',
   './assets/js/data/prompts.js',
   './assets/js/data/taxonomy.js',
-  './assets/fonts/atkinson-hyperlegible-400.woff2',
-  './assets/fonts/atkinson-hyperlegible-700.woff2',
+  './assets/fonts/atkinson-hyperlegible-next.woff2',
   './assets/icons/icon.svg',
 ];
 

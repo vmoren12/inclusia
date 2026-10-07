@@ -2,6 +2,7 @@
 // Convencions:
 //  - Els camps a omplir van entre claudàtors: [camp]. Si hi ha opcions, separa-les amb " / ".
 //  - [?] no és un camp: és la marca que demanem a la IA per assenyalar dubtes.
+//  - digital: true → l'usuari pot afegir-hi el complement «versió digital interactiva (HTML)».
 //  - Estructura: tasca + dades (omple) + instruccions numerades + què ha de lliurar.
 
 export const BUILTIN_PROMPTS = [
@@ -13,6 +14,7 @@ export const BUILTIN_PROMPTS = [
     actions: ['adaptar'],
     profiles: ['nouvingut'],
     formats: ['text', 'fitxa'],
+    digital: true,
     text: `Adapta el material adjunt per a un alumne nouvingut adolescent que no entén català ni castellà i té un anglès molt bàsic.
 
 Dades de l'alumne (omple):
@@ -38,6 +40,7 @@ Lliura el material adaptat llest per imprimir o projectar, el glossari i una lli
     actions: ['adaptar'],
     profiles: ['di', 'tdl', 'nouvingut', 'dua'],
     formats: ['text'],
+    digital: true,
     text: `Adapta el text adjunt a lectura fàcil per a alumnat de [etapa i curs] amb [perfil: ex. discapacitat intel·lectual lleu].
 
 Instruccions:
@@ -59,6 +62,7 @@ Lliura: el text en lectura fàcil, 3 preguntes de comprensió literal amb respos
     actions: ['adaptar'],
     profiles: ['dislexia'],
     formats: ['text', 'fitxa'],
+    digital: true,
     text: `Adapta el material adjunt per a un alumne de [etapa i curs] amb dislèxia.
 
 Instruccions:
@@ -79,6 +83,7 @@ Lliura el material adaptat i, al final, una llista breu dels canvis que has fet.
     actions: ['adaptar'],
     profiles: ['tea'],
     formats: ['fitxa'],
+    digital: true,
     text: `Adapta la fitxa adjunta per a un alumne de [etapa i curs] amb TEA.
 
 Dades de l'alumne (omple):
@@ -104,6 +109,7 @@ Lliura la fitxa adaptada llesta per imprimir i un resum de 2 línies dels canvis
     actions: ['adaptar'],
     profiles: ['tdah'],
     formats: ['fitxa', 'rubrica'],
+    digital: true,
     text: `Adapta la tasca adjunta per a un alumne de [etapa i curs] amb TDAH.
 
 Instruccions:
@@ -125,6 +131,7 @@ Lliura la tasca fragmentada llesta per imprimir i una versió en una sola línia
     actions: ['adaptar'],
     profiles: ['discalculia'],
     formats: ['fitxa', 'examen'],
+    digital: true,
     text: `Adapta els problemes de matemàtiques adjunts per a un alumne de [etapa i curs] amb discalcúlia.
 
 Instruccions:
@@ -145,6 +152,7 @@ Lliura els problemes adaptats, el solucionari amb els passos i una llista dels c
     actions: ['adaptar', 'avaluar'],
     profiles: ['dislexia', 'tdah', 'tea', 'tdl', 'dua'],
     formats: ['examen'],
+    digital: true,
     text: `Adapta l'examen adjunt per a un alumne de [etapa i curs] amb [perfil: ex. dislèxia / TDAH / TEA].
 
 Instruccions:
@@ -185,6 +193,7 @@ Lliura una taula amb dues columnes: consigna original · consigna nova.`,
     actions: ['adaptar'],
     profiles: ['visual'],
     formats: ['text', 'fitxa', 'document'],
+    digital: true,
     text: `Adapta el material adjunt per a un alumne de [etapa i curs] amb discapacitat visual que fa servir [lector de pantalla / macrotipus / braille].
 
 Instruccions:
@@ -205,6 +214,7 @@ Lliura el material adaptat i una llista de les imatges descrites per si en vull 
     actions: ['adaptar'],
     profiles: ['auditiva'],
     formats: ['text', 'fitxa', 'presentacio'],
+    digital: true,
     text: `Adapta el material o l'explicació adjunta per a un alumne de [etapa i curs] amb discapacitat auditiva ([usuari de llengua de signes / audiòfons o implant / lectura labial]).
 
 Instruccions:
@@ -225,6 +235,7 @@ Lliura el material adaptat, el glossari i les recomanacions.`,
     actions: ['adaptar'],
     profiles: ['tdl'],
     formats: ['text', 'fitxa'],
+    digital: true,
     text: `Adapta el material adjunt per a un alumne de [etapa i curs] amb trastorn del desenvolupament del llenguatge (TDL).
 
 Instruccions:
@@ -245,6 +256,7 @@ Lliura el material adaptat, el vocabulari clau i les activitats.`,
     actions: ['adaptar'],
     profiles: ['di'],
     formats: ['fitxa', 'text'],
+    digital: true,
     text: `Adapta l'activitat adjunta per a un alumne de [etapa i curs] amb discapacitat intel·lectual [lleu / moderada] que té un nivell de competència aproximat de [ex.: 2n de primària].
 
 Instruccions:
@@ -265,6 +277,7 @@ Lliura: objectius, activitat adaptada llesta per imprimir i una proposta d'avalu
     actions: ['adaptar'],
     profiles: ['motriu'],
     formats: ['fitxa', 'examen'],
+    digital: true,
     text: `Adapta les activitats adjuntes per a un alumne de [etapa i curs] amb discapacitat motriu que [no pot escriure a mà / escriu lentament / fa servir ordinador, commutador o comunicador].
 
 Instruccions:
@@ -284,6 +297,7 @@ Lliura les activitats adaptades i una llista de recursos o eines suggerides.`,
     actions: ['adaptar'],
     profiles: ['altes'],
     formats: ['fitxa', 'joc'],
+    digital: true,
     text: `Enriqueix l'activitat adjunta per a un alumne de [etapa i curs] amb altes capacitats, interessat en [interessos].
 
 Instruccions:
@@ -304,6 +318,7 @@ Lliura les extensions, el producte final amb criteris d'èxit i una estimació d
     actions: ['adaptar', 'crear'],
     profiles: ['dua', 'di', 'altes', 'nouvingut'],
     formats: ['fitxa'],
+    digital: true,
     text: `A partir de l'activitat adjunta, crea'n tres versions per a un grup de [etapa i curs] amb alumnat divers, perquè tothom treballi el mateix contingut alhora.
 
 Instruccions:
@@ -346,6 +361,7 @@ Lliura la presentació diapositiva per diapositiva (títol, contingut, suggerime
     actions: ['crear'],
     profiles: ['di', 'tdl', 'nouvingut', 'dua'],
     formats: ['text'],
+    digital: true,
     text: `Crea un text expositiu en lectura fàcil sobre [tema] per a alumnat de [etapa i curs] amb [perfil: ex. discapacitat intel·lectual / nouvingut / TDL].
 
 Instruccions:
@@ -365,6 +381,7 @@ Lliura el text, les activitats i el solucionari.`,
     actions: ['crear'],
     profiles: ['tea', 'di', 'emocional'],
     formats: ['historia', 'visual'],
+    digital: true,
     text: `Crea una història social per a un alumne de [edat] anys amb TEA sobre la situació següent: [ex.: la sortida al museu / quan canvia el mestre / esperar el torn].
 
 Dades (omple):
@@ -389,6 +406,7 @@ Lliura la història pàgina per pàgina (text + suggeriment d'imatge) i 2 consel
     actions: ['crear'],
     profiles: ['tea', 'di', 'tdl', 'tdah'],
     formats: ['visual'],
+    digital: true,
     text: `Crea una seqüència visual de passos per a [rutina o tasca: ex. entrar a classe / rentar-se les mans / fer un experiment] per a alumnat de [etapa] amb [perfil].
 
 Instruccions:
@@ -407,6 +425,7 @@ Lliura la seqüència en forma de taula (núm. · text · pictograma) i una vers
     actions: ['crear'],
     profiles: ['dua'],
     formats: ['fitxa'],
+    digital: true,
     text: `Crea una fitxa d'activitats sobre [tema] per a [etapa i curs], àrea de [àrea], pensada perquè tot l'alumnat hi pugui participar.
 
 Instruccions:
@@ -427,6 +446,7 @@ Lliura la fitxa llesta per imprimir i el solucionari.`,
     actions: ['crear'],
     profiles: ['nouvingut', 'tdl', 'auditiva', 'di'],
     formats: ['visual', 'fitxa'],
+    digital: true,
     text: `Crea un glossari visual del vocabulari clau de la unitat [tema / unitat] de [àrea], [etapa i curs], per a alumnat que parla [llengua].
 
 Instruccions:
@@ -445,6 +465,7 @@ Lliura el glossari en forma de taula llesta per imprimir i les dues activitats.`
     actions: ['crear', 'adaptar'],
     profiles: ['dua', 'tdah', 'dislexia', 'tdl', 'tea'],
     formats: ['esquema'],
+    digital: true,
     text: `Crea un esquema o mapa conceptual sobre [tema / el text adjunt] per a alumnat de [etapa i curs].
 
 Instruccions:
@@ -483,6 +504,7 @@ Lliura la presentació diapositiva per diapositiva (títol, contingut, suggerime
     actions: ['crear', 'avaluar'],
     profiles: ['dua', 'dislexia', 'tdah', 'tea'],
     formats: ['examen'],
+    digital: true,
     text: `Crea un examen sobre [tema] per a [etapa i curs], àrea de [àrea], accessible per a tot l'alumnat.
 
 Criteris d'avaluació que ha de cobrir (omple): [criteris o sabers]
@@ -504,6 +526,7 @@ Lliura l'examen, el solucionari amb criteris de correcció i una taula pregunta 
     actions: ['crear', 'avaluar'],
     profiles: ['dua', 'tea', 'tdah', 'di'],
     formats: ['rubrica'],
+    digital: true,
     text: `Crea una rúbrica per avaluar [tasca o producte: ex. una exposició oral] de [etapa i curs], comprensible per a tot l'alumnat.
 
 Instruccions:
@@ -523,6 +546,7 @@ Lliura la rúbrica en forma de taula, la llista de control i la versió amb pict
     actions: ['crear'],
     profiles: ['dua', 'dislexia', 'tdah', 'tdl'],
     formats: ['text', 'fitxa'],
+    digital: true,
     text: `Crea una guia de lectura per al text adjunt (o per a [títol del llibre / capítol]) per a [etapa i curs].
 
 Instruccions:
@@ -542,6 +566,7 @@ Lliura la guia llesta per imprimir i les respostes orientatives.`,
     actions: ['crear'],
     profiles: ['tea', 'tdl', 'motriu', 'di', 'nouvingut'],
     formats: ['visual'],
+    digital: true,
     text: `Crea el contingut d'un tauler de comunicació per a [activitat o context: ex. hora del pati / taller de cuina / classe de plàstica] per a un alumne de [edat] amb [perfil] que es comunica amb [pictogrames / poques paraules / comunicador].
 
 Instruccions:
@@ -561,6 +586,7 @@ Lliura el tauler en forma de taula (fila, columna, paraula, categoria, pictogram
     actions: ['crear'],
     profiles: ['tdah', 'tea', 'di', 'dua'],
     formats: ['rubrica', 'visual'],
+    digital: true,
     text: `Crea una guia pas a pas perquè alumnat de [etapa i curs] pugui fer de manera autònoma la tasca següent: [descripció de la tasca o projecte].
 
 Instruccions:
@@ -631,6 +657,111 @@ Instruccions:
 6. Inclou 3 orientacions breus per al docent per utilitzar-lo.
 
 Lliura el recurs llest per imprimir (amb suggeriments de pictogrames ARASAAC) i les orientacions.`,
+  },
+
+  // ───────────────────────── DIGITAL INTERACTIU (HTML) ─────────────────────────
+  {
+    id: 'digital-unitat-multinivell',
+    title: 'Crear una unitat digital multinivell (DUA) en un sol HTML',
+    description: 'Apunts, activitats autocorrectives i test final en tres nivells, tot en un fitxer.',
+    actions: ['crear'],
+    profiles: ['dua', 'tea', 'tdah', 'dislexia', 'nouvingut', 'di', 'altes'],
+    formats: ['digital', 'fitxa', 'examen'],
+    text: `Crea un material digital interactiu sobre [tema] per a [etapa i curs], àrea de [àrea], en un únic fitxer HTML, perquè tot l'alumnat el pugui fer servir de manera autònoma.
+
+Alumnat a tenir en compte (omple, sense noms): [ex.: 2 alumnes amb dislèxia, 1 amb TEA, 1 nouvingut]
+
+Instruccions:
+1. Tècnic: HTML, CSS i JavaScript en un sol fitxer, sense llibreries externes ni connexió. Ha de funcionar en ordinador, tauleta i mòbil.
+2. Tres seccions amb navegació simple i sempre visible: Apunts · Activitats · Test final.
+3. Apunts: contingut clau en blocs curts, amb exemples, un glossari desplegable i un esquema resum.
+4. Multinivell DUA: selector de nivell (● amb suport · ■ estàndard · ▲ ampliació) que canviï consignes, ajudes i dificultat sense canviar el tema.
+5. Activitats autocorrectives variades (opció múltiple, relacionar, completar, ordenar, verdader/fals): 8-10 per nivell, amb retroacció que expliqui l'error, pistes graduades i opció de tornar-ho a provar.
+6. Test final de [10] preguntes amb puntuació i resum del que cal repassar.
+7. Accessibilitat: escoltar el text (síntesi de veu del navegador), mida de lletra ajustable, alt contrast, navegació amb teclat, text alternatiu i informació que no depengui només del color.
+8. Progrés desat al navegador i botó per imprimir.
+
+Lliura el codi complet en un sol bloc, sense parts omeses, i 3 línies d'instruccions d'ús per al docent.`,
+  },
+  {
+    id: 'digital-convertir-material',
+    title: 'Convertir un material en una activitat digital interactiva',
+    description: 'Apunts o fitxa en paper → pantalles curtes amb activitats autocorrectives (HTML).',
+    actions: ['adaptar'],
+    profiles: ['dua', 'tdah', 'dislexia', 'tea', 'tdl'],
+    formats: ['digital', 'fitxa', 'text'],
+    text: `Converteix el material adjunt (apunts, fitxa o activitats) en un recurs digital interactiu, en un únic fitxer HTML, per a alumnat de [etapa i curs] amb [perfil].
+
+Instruccions:
+1. Mantén el contingut i els objectius. No inventis informació: marca amb [?] el que hagi de revisar.
+2. Tècnic: HTML, CSS i JavaScript en un sol fitxer, sense llibreries externes ni connexió. Ha de funcionar en mòbil i ordinador.
+3. Divideix el contingut en pantalles curtes, amb una barra de progrés.
+4. Converteix els exercicis en activitats autocorrectives (opció múltiple, completar, relacionar, ordenar) amb retroacció immediata i pistes.
+5. Afegeix suports per al perfil indicat: [ex.: escoltar el text / glossari emergent / consignes amb pictograma].
+6. Accessibilitat: navegació amb teclat, mida de lletra ajustable, alt contrast i text alternatiu.
+7. Pantalla final amb resultats i botons per tornar a començar o imprimir.
+
+Lliura el codi complet en un sol bloc i una llista breu dels canvis respecte de l'original.`,
+  },
+  {
+    id: 'digital-test-autocorrectiu',
+    title: 'Crear un test autocorrectiu en HTML',
+    description: 'Preguntes variades amb retroacció immediata, àudio i resultat final.',
+    actions: ['avaluar', 'crear'],
+    profiles: ['dua', 'dislexia', 'tdah', 'tea'],
+    formats: ['digital', 'examen'],
+    text: `Crea un test autocorrectiu sobre [tema / el material adjunt] per a [etapa i curs], en un únic fitxer HTML.
+
+Instruccions:
+1. [10-15] preguntes alineades amb aquests criteris: [criteris d'avaluació].
+2. Tipus variats: opció múltiple, verdader/fals, completar, relacionar i ordenar.
+3. Una pregunta per pantalla, de menys a més dificultat, amb barra de progrés.
+4. Retroacció immediata a cada resposta: si és incorrecta, explicació breu de l'error i una pista per tornar-ho a provar.
+5. Botó per escoltar l'enunciat (síntesi de veu del navegador) i mida de lletra ajustable.
+6. Resultat final: puntuació, preguntes fallades amb la resposta correcta i què cal repassar.
+7. Ordre aleatori de preguntes i respostes per poder repetir el test.
+8. Tècnic: HTML, CSS i JavaScript en un sol fitxer, sense llibreries externes ni connexió; navegable amb teclat.
+
+Lliura el codi complet en un sol bloc i, a part, la llista de preguntes i respostes per revisar-les.`,
+  },
+  {
+    id: 'digital-joc-repas',
+    title: 'Crear un joc digital de repàs',
+    description: 'Memory, roda de preguntes o escape room en HTML, amb tres nivells.',
+    actions: ['crear'],
+    profiles: ['dua', 'tdah', 'tea', 'altes'],
+    formats: ['digital', 'joc'],
+    text: `Crea un joc digital de repàs sobre [tema] per a [etapa i curs], en un únic fitxer HTML.
+
+Instruccions:
+1. Tipus de joc: [memory / roda de preguntes / escape room / relacionar contra rellotge].
+2. [15-20] reptes, amb tres nivells de dificultat seleccionables (● ■ ▲).
+3. Pantalla inicial amb les normes en 3 passos curts i un exemple.
+4. Retroacció immediata i positiva; si hi ha un error, explicació breu i una nova oportunitat.
+5. Temporitzador opcional (desactivable) i sense penalitzacions que generin ansietat.
+6. Accessibilitat: navegació amb teclat, alt contrast, sons opcionals i informació que no depengui només del color.
+7. Tècnic: HTML, CSS i JavaScript en un sol fitxer, sense llibreries externes ni connexió; funciona en mòbil.
+
+Lliura el codi complet en un sol bloc i la llista de reptes amb les solucions.`,
+  },
+  {
+    id: 'digital-sequencia-visual',
+    title: 'Crear una seqüència visual interactiva',
+    description: 'Passos amb imatge, àudio i botó «Fet» per a rutines i tasques (HTML).',
+    actions: ['crear'],
+    profiles: ['tea', 'di', 'tdl', 'tdah'],
+    formats: ['digital', 'visual'],
+    text: `Crea una seqüència visual interactiva per a [rutina o tasca] per a alumnat de [etapa] amb [perfil], en un únic fitxer HTML.
+
+Instruccions:
+1. [5-8] passos, un per pantalla o targeta, amb text curt (màx. 4 paraules) i espai per a una imatge.
+2. Per a cada pas, indica en un comentari del codi la paraula a cercar a ARASAAC, i fes que la imatge sigui fàcil de substituir.
+3. Botó per escoltar cada pas (síntesi de veu del navegador) i botó «Fet» que el marqui com a completat.
+4. Indicador visual de progrés i pantalla final de reforç positiu.
+5. Disseny tranquil: pocs colors, sense animacions brusques ni sons inesperats, botons grans.
+6. Tècnic: HTML, CSS i JavaScript en un sol fitxer, sense llibreries externes ni connexió; funciona en tauleta.
+
+Lliura el codi complet en un sol bloc i 2 línies d'instruccions per canviar les imatges.`,
   },
 
   // ───────────────────────── AVALUAR ─────────────────────────
