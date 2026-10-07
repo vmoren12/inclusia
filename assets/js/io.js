@@ -12,6 +12,7 @@ export function buildExport(state) {
     prompts: state.prompts,
     favorites: state.favorites,
     stats: state.stats,
+    applied: state.applied,
   };
 }
 
@@ -29,8 +30,8 @@ export function parseImport(json) {
     throw new Error('Aquest fitxer no és una exportació d’Inclusia.');
   }
   const clean = sanitizeState(data);
-  if (!clean.prompts.length && !clean.favorites.length) {
-    throw new Error('El fitxer no conté cap prompt vàlid.');
+  if (!clean.prompts.length && !clean.favorites.length && !clean.applied.length) {
+    throw new Error('El fitxer no conté dades vàlides.');
   }
   return clean;
 }
@@ -38,12 +39,18 @@ export function parseImport(json) {
 /**
  * Fusiona les dades importades amb les actuals.
  * mode 'merge': afegeix i, si hi ha el mateix id, es queda amb la versió més recent.
- * mode 'replace': substitueix prompts, preferits i estadístiques.
+ * mode 'replace': substitueix prompts, preferits, estadístiques i recomanacions aplicades.
  * Retorna { state, added, updated } sense modificar l'estat original.
  */
 export function applyImport(state, imported, mode = 'merge') {
   if (mode === 'replace') {
-    const next = { ...state, prompts: imported.prompts, favorites: imported.favorites, stats: imported.stats };
+    const next = {
+      ...state,
+      prompts: imported.prompts,
+      favorites: imported.favorites,
+      stats: imported.stats,
+      applied: imported.applied,
+    };
     return { state: next, added: imported.prompts.length, updated: 0 };
   }
   const byId = new Map(state.prompts.map((p) => [p.id, p]));
@@ -73,6 +80,7 @@ export function applyImport(state, imported, mode = 'merge') {
     ...state,
     prompts,
     favorites: [...new Set([...state.favorites, ...imported.favorites])],
+    applied: [...new Set([...state.applied, ...imported.applied])],
     stats,
   };
   return { state: next, added, updated };

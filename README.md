@@ -18,6 +18,7 @@ per a qualsevol perfil: TEA, TDAH, dislèxia, discalcúlia, TDL, discapacitat in
 - **Omplir camps**: els camps entre `[claudàtors]` es poden omplir abans de copiar. Si un camp té opcions (`[llatí / no llatí]`), es mostren com a suggeriments.
 - **Copiar amb un clic** des de la targeta o des del detall.
 - **Versió digital interactiva (HTML)**: als prompts on té sentit, un interruptor afegeix la petició d'un únic fitxer HTML amb apunts, activitats autocorrectives, nivells DUA (● ■ ▲) i test final. També hi ha prompts digitals específics (unitat multinivell, test autocorrectiu, joc de repàs, seqüència visual) i el filtre de format «Digital interactiu (HTML)».
+- **Aula**: més de 50 recomanacions basades en l'evidència per fer més inclusius l'espai, les sessions, els materials, l'avaluació, el clima i l'organització. Cada una indica com aplicar-la, per què funciona i la font, amb filtres per àmbit, perfil, nivell de suport (Decret 150/2017), facilitat d'aplicació i solidesa de l'evidència. Pots marcar les que ja apliques i imprimir la llista.
 - **Generador**: combina acció, perfils, format, etapa i opcions, i construeix un prompt estructurat al moment. Inclou el format digital i l'opció de versió digital.
 - **Prompts propis**: crea, edita, duplica i elimina. Si edites un prompt inclòs, es desa com a versió teva i pots restaurar l'original.
 - **Exportar i importar** en JSON (afegint o substituint).
@@ -47,12 +48,14 @@ npm test       # proves unitàries (node --test, Node 20+)
 ```
 index.html                 Estructura de la pàgina
 assets/css/styles.css      Estils (tokens, tema clar/fosc, responsive)
-assets/js/main.js          Interfície i esdeveniments
+assets/js/main.js          Interfície i esdeveniments (biblioteca, generador)
+assets/js/aula.js          Secció Aula (recomanacions)
+assets/js/utils.js         Utilitats de DOM compartides
 assets/js/store.js         Estat i localStorage (validació de dades)
 assets/js/io.js            Exportació / importació
 assets/js/placeholders.js  Detecció i emplenament de camps [..]
 assets/js/builder.js       Generador de prompts
-assets/js/data/            Prompts, facetes, blocs del generador i complement digital
+assets/js/data/            Prompts, recomanacions d'aula, facetes, blocs del generador i complement digital
 sw.js                      Funcionament sense connexió
 tests/                     Proves unitàries
 ```
@@ -71,6 +74,11 @@ Cada `push` a `main` executa les proves i publica la web a GitHub Pages amb GitH
 
 Les dades es guarden només al navegador de cada usuari. No introdueixis mai noms ni dades personals de l'alumnat als prompts, i revisa sempre el resultat de la IA abans de fer-lo servir.
 
-## Llicència
+## Autoria i llicència
 
-Codi sota llicència [MIT](LICENSE). Tipografia [Atkinson Hyperlegible Next](https://www.brailleinstitute.org/freefont/) sota [SIL Open Font License](assets/fonts/OFL.txt). Els pictogrames suggerits són d'[ARASAAC](https://arasaac.org) (Govern d'Aragó, CC BY-NC-SA).
+© 2026 Víctor Moreno de la Torre, psicòleg i orientador educatiu.
+
+- **Codi**: llicència [MIT](LICENSE).
+- **Continguts** (prompts i recomanacions d'aula, a `assets/js/data/`): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ca). Els pots reutilitzar i adaptar citant-ne l'autoria.
+
+Tipografia [Atkinson Hyperlegible Next](https://www.brailleinstitute.org/freefont/) sota [SIL Open Font License](assets/fonts/OFL.txt). Els pictogrames suggerits són d'[ARASAAC](https://arasaac.org) (Govern d'Aragó, CC BY-NC-SA).

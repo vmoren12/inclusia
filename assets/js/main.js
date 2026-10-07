@@ -6,6 +6,8 @@ import { loadState, saveState, mergePrompts, upsertPrompt, removePrompt, STORAGE
 import { buildExport, parseImport, applyImport } from './io.js';
 import { buildPrompt } from './builder.js';
 import { DIGITAL_FORMAT, DIGITAL_ADDON, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
+import { $, $$, esc, matchesQuery, slug, toast, copyText, flashButton, download } from './utils.js';
+import { initAula } from './aula.js';
 
 /* ───────────────────────── Estat ───────────────────────── */
 
@@ -22,15 +24,7 @@ const ui = {
 const fieldValues = {};
 let current = null; // prompt obert al diàleg
 let editing = null; // { mode: 'new' | 'edit' | 'override' | 'duplicate', base }
-
-const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-
-const esc = (s) =>
-  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-
-const normalize = (s) =>
-  String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/·/g, '');
+let aula = { render() {} }; // secció Aula (s'inicialitza a init)
 
 function refresh() {
   prompts = mergePrompts(BUILTIN_PROMPTS, state.prompts);
@@ -39,57 +33,6 @@ function refresh() {
 function persist() {
   if (!saveState(state)) toast('No s’ha pogut desar: l’emmagatzematge del navegador està ple o bloquejat.');
 }
-
-/* ───────────────────────── Utilitats ───────────────────────── */
-
-let toastTimer;
-function toast(message) {
-  const el = $('#toast');
-  el.textContent = message;
-  el.classList.add('is-visible');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('is-visible'), 2600);
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    // Alternativa per a navegadors sense API del porta-retalls (o context no segur).
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.className = 'sr-only';
-    document.body.append(ta);
-    ta.select();
-    const ok = document.execCommand('copy');
-    ta.remove();
-    return ok;
-  }
-}
-
-function flashButton(btn, label = 'Copiat') {
-  const original = btn.innerHTML;
-  btn.classList.add('is-done');
-  btn.textContent = `${label} ✓`;
-  setTimeout(() => {
-    btn.classList.remove('is-done');
-    btn.innerHTML = original;
-  }, 1500);
-}
-
-function download(filename, content, type) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
-  document.body.append(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-const slug = (s) =>
-  normalize(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'prompt';
 
 const isFav = (id) => state.favorites.includes(id);
 // Complement digital (HTML): preferència global, només per als prompts que l'admeten.
@@ -129,17 +72,15 @@ function matches(p, { skipFacet } = {}) {
     if (selected.size && !facetValues(p, key).some((v) => selected.has(v))) return false;
   }
   if (ui.query) {
-    const haystack = normalize(
-      [
-        p.title,
-        p.description,
-        p.text,
-        ...p.actions.map((id) => labelOf(ACTIONS, id)),
-        ...p.profiles.map((id) => labelOf(PROFILES, id)),
-        ...facetValues(p, 'formats').map((id) => labelOf(FORMATS, id)),
-      ].join(' '),
-    );
-    if (!normalize(ui.query).split(/\s+/).filter(Boolean).every((w) => haystack.includes(w))) return false;
+    const parts = [
+      p.title,
+      p.description,
+      p.text,
+      ...p.actions.map((id) => labelOf(ACTIONS, id)),
+      ...p.profiles.map((id) => labelOf(PROFILES, id)),
+      ...facetValues(p, 'formats').map((id) => labelOf(FORMATS, id)),
+    ];
+    if (!matchesQuery(ui.query, parts)) return false;
   }
   return true;
 }
@@ -503,14 +444,22 @@ function renderBuilderOutput() {
 
 /* ───────────────────────── Vistes, tema i importació ───────────────────────── */
 
+// Cada vista té el seu fragment d'URL perquè es pugui enllaçar i recarregar.
+const VIEWS = { library: '', builder: '#generador', aula: '#aula' };
+let currentView = 'library';
+const viewUrl = () => VIEWS[currentView] || location.pathname + location.search;
+
 function showView(view) {
-  $('#view-library').hidden = view !== 'library';
-  $('#view-builder').hidden = view !== 'builder';
+  if (!(view in VIEWS)) return;
+  const changed = view !== currentView;
+  currentView = view;
+  for (const v of Object.keys(VIEWS)) $(`#view-${v}`).hidden = v !== view;
   $$('.tabs__btn').forEach((b) => {
     if (b.dataset.view === view) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   });
-  window.scrollTo({ top: 0 });
+  if (!location.hash.startsWith('#p=')) history.replaceState(null, '', viewUrl());
+  if (changed) window.scrollTo({ top: 0 });
 }
 
 const THEMES = ['auto', 'light', 'dark'];
@@ -532,19 +481,23 @@ async function handleImportFile(file) {
   }
   const n = pendingImport.prompts.length;
   const f = pendingImport.favorites.length;
-  $('#import-summary').textContent = `El fitxer conté ${n} ${n === 1 ? 'prompt' : 'prompts'} i ${f} ${f === 1 ? 'preferit' : 'preferits'}.`;
+  const a = pendingImport.applied.length;
+  $('#import-summary').textContent =
+    `El fitxer conté ${n} ${n === 1 ? 'prompt' : 'prompts'}, ${f} ${f === 1 ? 'preferit' : 'preferits'} ` +
+    `i ${a} ${a === 1 ? 'mesura d’aula marcada' : 'mesures d’aula marcades'}.`;
   $('#dlg-import').showModal();
 }
 
 function finishImport(mode) {
   if (!pendingImport) return;
-  if (mode === 'replace' && !confirm('Se substituiran tots els teus prompts i preferits actuals. Vols continuar?')) return;
+  if (mode === 'replace' && !confirm('Se substituiran tots els teus prompts, preferits i mesures marcades. Vols continuar?')) return;
   const result = applyImport(state, pendingImport, mode);
   state = result.state;
   pendingImport = null;
   persist();
   refresh();
   renderLibrary();
+  aula.render();
   toast(
     mode === 'replace'
       ? `Importació feta: ${result.added} prompts.`
@@ -555,7 +508,7 @@ function finishImport(mode) {
 function exportData() {
   const date = new Date().toISOString().slice(0, 10);
   download(`inclusia-${date}.json`, JSON.stringify(buildExport(state), null, 2), 'application/json');
-  toast(state.prompts.length ? 'Dades exportades' : 'Exportat (encara no tens prompts propis, només preferits)');
+  toast('Dades exportades');
 }
 
 /* ───────────────────────── Esdeveniments ───────────────────────── */
@@ -668,7 +621,7 @@ function bindEvents() {
   });
   $('#dlg-view').addEventListener('close', () => {
     current = null;
-    if (location.hash.startsWith('#p=')) history.replaceState(null, '', location.pathname + location.search);
+    if (location.hash.startsWith('#p=')) history.replaceState(null, '', viewUrl());
   });
 
   // Editor
@@ -757,11 +710,15 @@ function bindEvents() {
     renderBuilderOutput();
   });
 
-  // Teclat: "/" per cercar
+  // Teclat: "/" per anar al cercador de la vista actual
   document.addEventListener('keydown', (e) => {
     if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target.closest('input, textarea, select, [contenteditable]') || $('dialog[open]')) return;
     e.preventDefault();
+    if (currentView === 'aula') {
+      $('#aula-search').focus();
+      return;
+    }
     showView('library');
     $('#search').focus();
   });
@@ -772,22 +729,29 @@ function bindEvents() {
     state = loadState();
     refresh();
     renderLibrary();
+    aula.render();
     applyTheme();
   });
 
   // Filtres plegats en pantalles petites
   const narrow = matchMedia('(max-width: 900px)');
-  const syncFilters = () => ($('#filters').open = !narrow.matches);
+  const syncFilters = () => $$('.filters').forEach((d) => (d.open = !narrow.matches));
   narrow.addEventListener('change', syncFilters);
   syncFilters();
 }
 
 /* ───────────────────────── Inici ───────────────────────── */
 
-// Enllaç directe a un prompt: #p=<id>
+// Enllaços directes: #p=<id> obre un prompt; #generador i #aula obren la vista.
 function openFromHash() {
   const match = location.hash.match(/^#p=(.+)$/);
-  if (match && match[1] !== current?.id) openView(decodeURIComponent(match[1]));
+  if (match) {
+    showView('library');
+    if (match[1] !== current?.id) openView(decodeURIComponent(match[1]));
+    return;
+  }
+  const view = Object.keys(VIEWS).find((v) => VIEWS[v] && VIEWS[v] === location.hash);
+  showView(view ?? 'library');
 }
 
 function init() {
@@ -800,6 +764,8 @@ function init() {
   renderBuilderControls();
   syncBuilderForm();
   renderBuilderOutput();
+
+  aula = initAula({ getState: () => state, persist });
 
   openFromHash();
   window.addEventListener('hashchange', openFromHash);

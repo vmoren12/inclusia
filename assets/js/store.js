@@ -15,7 +15,14 @@ const VALID = {
 const LIMITS = { title: 200, description: 500, text: 20000 };
 
 export function emptyState() {
-  return { version: SCHEMA_VERSION, prompts: [], favorites: [], stats: {}, settings: { theme: 'auto', digital: false } };
+  return {
+    version: SCHEMA_VERSION,
+    prompts: [],
+    favorites: [],
+    stats: {},
+    applied: [], // recomanacions d'aula marcades com a aplicades
+    settings: { theme: 'auto', digital: false },
+  };
 }
 
 export function createId() {
@@ -63,6 +70,9 @@ export function sanitizeState(raw) {
   }
   if (Array.isArray(raw.favorites)) {
     state.favorites = [...new Set(raw.favorites.filter((f) => typeof f === 'string'))];
+  }
+  if (Array.isArray(raw.applied)) {
+    state.applied = [...new Set(raw.applied.filter((a) => typeof a === 'string'))];
   }
   if (raw.stats && typeof raw.stats === 'object') {
     for (const [k, v] of Object.entries(raw.stats)) {

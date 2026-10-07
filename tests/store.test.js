@@ -79,3 +79,8 @@ test('upsertPrompt actualitza mantenint createdAt i removePrompt neteja preferit
   removePrompt(state, p.id);
   assert.deepEqual(state, emptyState());
 });
+
+test('sanitizeState conserva les recomanacions aplicades', () => {
+  const s = sanitizeState({ applied: ['aula-soroll', 'aula-soroll', 7] });
+  assert.deepEqual(s.applied, ['aula-soroll']);
+});

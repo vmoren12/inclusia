@@ -17,7 +17,7 @@ test('exportació i importació són compatibles', () => {
 test('parseImport rebutja fitxers que no són d’Inclusia', () => {
   assert.throws(() => parseImport('no és json'), /JSON/);
   assert.throws(() => parseImport('{"app":"altra"}'), /Inclusia/);
-  assert.throws(() => parseImport('{"app":"inclusia","prompts":[]}'), /cap prompt/);
+  assert.throws(() => parseImport('{"app":"inclusia","prompts":[]}'), /dades vàlides/);
 });
 
 test('parseImport accepta una llista simple de prompts', () => {
