@@ -2,7 +2,7 @@
 // Estratègia "network first": sempre la versió més nova si hi ha xarxa; la memòria cau si no n'hi ha.
 // Incrementa VERSION quan canviï la llista de fitxers.
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE = `inclusia-${VERSION}`;
 const ASSETS = [
   './',
