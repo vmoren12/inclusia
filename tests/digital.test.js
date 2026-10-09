@@ -1,6 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DIGITAL_ADDON, supportsDigitalAddon, withDigitalAddon } from '../assets/js/data/digital.js';
+import {
+  DIGITAL_ADDON,
+  DIGITAL_HINT,
+  DIGITAL_SPECS,
+  digitalAddonFor,
+  digitalHintFor,
+  supportsDigitalAddon,
+  withDigitalAddon,
+} from '../assets/js/data/digital.js';
 import { BUILTIN_PROMPTS } from '../assets/js/data/prompts.js';
 import { buildPrompt } from '../assets/js/builder.js';
 import { findPlaceholders } from '../assets/js/placeholders.js';

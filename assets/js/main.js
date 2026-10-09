@@ -5,7 +5,7 @@ import { findPlaceholders, fillPlaceholders, tokenize } from './placeholders.js'
 import { loadState, saveState, mergePrompts, upsertPrompt, removePrompt, STORAGE_KEY } from './store.js';
 import { buildExport, parseImport, applyImport } from './io.js';
 import { buildPrompt } from './builder.js';
-import { DIGITAL_FORMAT, DIGITAL_ADDON, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
+import { DIGITAL_FORMAT, digitalAddonFor, digitalHintFor, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
 import { $, $$, esc, matchesQuery, slug, toast, copyText, flashButton, download } from './utils.js';
 import { initAula } from './aula.js';
 
@@ -37,7 +37,7 @@ function persist() {
 const isFav = (id) => state.favorites.includes(id);
 // Complement digital (HTML): preferència global, només per als prompts que l'admeten.
 const digitalOn = (p) => state.settings.digital && supportsDigitalAddon(p);
-const promptText = (p) => (digitalOn(p) ? withDigitalAddon(p.text) : p.text);
+const promptText = (p) => (digitalOn(p) ? withDigitalAddon(p.text, p) : p.text);
 // Els prompts que admeten el complement també apareixen al filtre de format digital.
 const facetValues = (p, key) =>
   key === 'formats' && supportsDigitalAddon(p) ? [...p.formats, DIGITAL_FORMAT] : p[key];
@@ -222,7 +222,7 @@ function renderPromptText(target, text, addon = '') {
 }
 
 function renderViewText() {
-  renderPromptText($('#view-text'), current.text, digitalOn(current) ? DIGITAL_ADDON : '');
+  renderPromptText($('#view-text'), current.text, digitalOn(current) ? digitalAddonFor(current) : '');
 }
 
 function openView(id) {
@@ -250,6 +250,7 @@ function openView(id) {
     .join('');
   $('#view-digital-box').hidden = !supportsDigitalAddon(p);
   $('#view-digital').checked = state.settings.digital;
+  $('#view-digital-hint').textContent = digitalHintFor(p);
   renderViewText();
 
   const fav = $('#view-fav');
