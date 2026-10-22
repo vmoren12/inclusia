@@ -1,10 +1,28 @@
 import { BUILTIN_PROMPTS } from './data/prompts.js';
 import { ACTIONS, PROFILES, FORMATS, FACETS, labelOf } from './data/taxonomy.js';
-import { BUILDER_ACTIONS, BUILDER_STAGES, BUILDER_FORMATS, BUILDER_EXTRAS } from './data/builder-blocks.js';
+import {
+  BUILDER_ACTIONS,
+  BUILDER_STAGES,
+  BUILDER_DURATIONS,
+  BUILDER_FORMATS,
+  UNIVERSAL_PROFILE,
+  DUA_PRINCIPLES,
+  LEVEL_COUNTS,
+  LEVEL_STYLES,
+  LEVEL_MODES,
+  BUILDER_SCAFFOLDS,
+  BUILDER_EXERCISES,
+  BUILDER_COUNTS,
+  BLOOM_LEVELS,
+  BUILDER_TEACHER,
+  BUILDER_VISUAL,
+  BUILDER_QUALITY,
+  BUILDER_PRESETS,
+} from './data/builder-blocks.js';
 import { findPlaceholders, fillPlaceholders, tokenize } from './placeholders.js';
 import { loadState, saveState, mergePrompts, upsertPrompt, removePrompt, STORAGE_KEY } from './store.js';
 import { buildExport, parseImport, applyImport } from './io.js';
-import { buildPrompt } from './builder.js';
+import { buildPrompt, builderDefaults } from './builder.js';
 import { DIGITAL_FORMAT, digitalAddonFor, digitalHintFor, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
 import { $, $$, esc, matchesQuery, slug, toast, copyText, flashButton, download } from './utils.js';
 import { initAula } from './aula.js';
@@ -217,7 +235,9 @@ function renderPromptText(target, text, addon = '') {
           ? esc(t.value)
           : `<mark class="ph${t.type === 'filled' ? ' ph--filled' : ''}" title="${esc(t.key)}">${esc(t.value)}</mark>`,
       )
-      .join('') + (addon ? `
+      .join('')
+      // Títols de secció («## …») destacats perquè els prompts llargs es llegeixin millor.
+      .replace(/^## (.*)$/gm, '<span class="prompt-h">## $1</span>') + (addon ? `
 <span class="addon">${esc(addon)}</span>` : '');
 }
 
@@ -357,23 +377,34 @@ function saveEditor(event) {
 
 /* ───────────────────────── Generador ───────────────────────── */
 
-const BUILDER_KEY = 'inclusia.builder';
-const builderDefaults = () => ({
-  action: 'adaptar',
-  format: 'fitxa',
-  profiles: [],
-  stage: '',
-  area: '',
-  topic: '',
-  notes: '',
-  extras: BUILDER_EXTRAS.filter((e) => e.default).map((e) => e.id),
-});
-let builder = builderDefaults();
+const BUILDER_KEY = 'inclusia.builder.v2';
+// Grups de xips del generador: clau de la configuració → opcions.
+const CHIP_GROUPS = {
+  dua: DUA_PRINCIPLES,
+  scaffolds: BUILDER_SCAFFOLDS,
+  exercises: BUILDER_EXERCISES,
+  bloom: BLOOM_LEVELS,
+  teacher: BUILDER_TEACHER,
+  visual: BUILDER_VISUAL,
+  quality: BUILDER_QUALITY,
+};
+const SELECTS = { duration: '#b-duration', levelStyle: '#b-level-style', levelMode: '#b-level-mode', count: '#b-count' };
+const TEXTS = { stage: '#b-stage', area: '#b-area', topic: '#b-topic', goal: '#b-goal', notes: '#b-notes' };
+
+// `custom`: text editat a mà (null si es fa servir el generat).
+let builder = { ...builderDefaults(), custom: null };
+let built = null;
+let editingText = false;
 
 function loadBuilder() {
   try {
     const saved = JSON.parse(localStorage.getItem(BUILDER_KEY) ?? 'null');
-    if (saved && typeof saved === 'object') builder = { ...builderDefaults(), ...saved };
+    if (!saved || typeof saved !== 'object') return;
+    const defaults = builderDefaults();
+    for (const [key, value] of Object.entries(defaults)) {
+      if (Array.isArray(value) ? Array.isArray(saved[key]) : typeof saved[key] === typeof value) builder[key] = saved[key];
+    }
+    builder.custom = typeof saved.custom === 'string' ? saved.custom : null;
   } catch {
     /* sense dades desades */
   }
@@ -387,60 +418,140 @@ function saveBuilder() {
   }
 }
 
+const options = (items) => items.map((i) => `<option value="${esc(i.id)}">${esc(i.label)}</option>`).join('');
+
+function chipHTML(name, item, type = 'checkbox', extra = '') {
+  const attrs = [
+    item.onlyFor ? `data-only="${item.onlyFor}"` : '',
+    item.activities ? 'data-activities' : '',
+    item.paper ? 'data-paper' : '',
+    item.verbs ? `title="${esc(item.verbs)}"` : '',
+    extra,
+  ].join(' ');
+  return `<label class="chip" ${attrs}><input type="${type}" name="${name}" value="${esc(item.id)}"><span>${esc(item.label)}</span></label>`;
+}
+
 function renderBuilderControls() {
+  $('#b-presets').innerHTML = BUILDER_PRESETS.map(
+    (p) => `<button class="preset" type="button" data-preset="${p.id}"><strong>${esc(p.label)}</strong><span>${esc(p.hint)}</span></button>`,
+  ).join('');
   $('#b-action').innerHTML = BUILDER_ACTIONS.map(
     (a) => `<label><input type="radio" name="b-action" value="${a.id}"><span>${esc(a.label)}</span></label>`,
   ).join('');
-  $('#b-profiles').innerHTML = PROFILES.map(
-    (p) => `<label class="chip"><input type="checkbox" name="b-profiles" value="${p.id}"><span>${esc(p.label)}</span></label>`,
-  ).join('');
+  $('#b-profiles').innerHTML =
+    chipHTML('b-profiles', UNIVERSAL_PROFILE, 'checkbox', 'data-universal') +
+    PROFILES.map((p) => chipHTML('b-profiles', p)).join('');
   $('#b-format').innerHTML = FORMATS.filter((f) => BUILDER_FORMATS[f.id])
-    .map((f) => `<label class="chip"><input type="radio" name="b-format" value="${f.id}"><span>${esc(f.label)}</span></label>`)
+    .map((f) => chipHTML('b-format', f, 'radio'))
     .join('');
-  $('#b-extras').innerHTML = BUILDER_EXTRAS.map(
-    (e) =>
-      `<label class="chip" data-only="${e.onlyFor ?? ''}" data-not-format="${e.notForFormat ?? ''}"><input type="checkbox" name="b-extras" value="${e.id}"><span>${esc(e.label)}</span></label>`,
+  $('#b-levels').innerHTML = LEVEL_COUNTS.map(
+    (l) => `<label><input type="radio" name="b-levels" value="${l.id}"><span>${esc(l.label)}</span></label>`,
   ).join('');
+  for (const [key, items] of Object.entries(CHIP_GROUPS)) {
+    $(`#b-${key}`).innerHTML = items.map((i) => chipHTML(`b-${key}`, i)).join('');
+  }
+  $('#b-duration').innerHTML = options(BUILDER_DURATIONS);
+  $('#b-level-style').innerHTML = options(LEVEL_STYLES);
+  $('#b-level-mode').innerHTML = options(LEVEL_MODES);
+  $('#b-count').innerHTML = options(BUILDER_COUNTS);
   $('#b-stage-list').innerHTML = BUILDER_STAGES.map((s) => `<option value="${esc(s)}"></option>`).join('');
 }
 
 function syncBuilderForm() {
   const form = $('#builder-form');
-  $$('input[name="b-action"]', form).forEach((i) => (i.checked = i.value === builder.action));
-  $$('input[name="b-format"]', form).forEach((i) => (i.checked = i.value === builder.format));
-  $$('input[name="b-profiles"]', form).forEach((i) => (i.checked = builder.profiles.includes(i.value)));
-  $$('input[name="b-extras"]', form).forEach((i) => (i.checked = builder.extras.includes(i.value)));
-  $('#b-stage').value = builder.stage;
-  $('#b-area').value = builder.area;
-  $('#b-topic').value = builder.topic;
-  $('#b-notes').value = builder.notes;
+  const check = (name, isOn) => $$(`input[name="${name}"]`, form).forEach((i) => (i.checked = isOn(i.value)));
+  check('b-action', (v) => v === builder.action);
+  check('b-format', (v) => v === builder.format);
+  check('b-levels', (v) => v === builder.levels);
+  check('b-profiles', (v) => builder.profiles.includes(v));
+  for (const key of Object.keys(CHIP_GROUPS)) check(`b-${key}`, (v) => builder[key].includes(v));
+  for (const [key, sel] of Object.entries({ ...SELECTS, ...TEXTS })) $(sel).value = builder[key];
+  $('#b-digital').checked = builder.digital;
 }
 
 function readBuilderForm() {
   const form = $('#builder-form');
-  builder = {
-    action: $('input[name="b-action"]:checked', form)?.value ?? 'adaptar',
-    format: $('input[name="b-format"]:checked', form)?.value ?? 'fitxa',
-    profiles: $$('input[name="b-profiles"]:checked', form).map((i) => i.value),
-    extras: $$('input[name="b-extras"]:checked', form).map((i) => i.value),
-    stage: $('#b-stage').value,
-    area: $('#b-area').value,
-    topic: $('#b-topic').value,
-    notes: $('#b-notes').value,
-  };
+  const radio = (name, fallback) => $(`input[name="${name}"]:checked`, form)?.value ?? fallback;
+  const checked = (name) => $$(`input[name="${name}"]:checked`, form).map((i) => i.value);
+  builder.action = radio('b-action', 'adaptar');
+  builder.format = radio('b-format', 'fitxa');
+  builder.levels = radio('b-levels', '1');
+  builder.profiles = checked('b-profiles');
+  for (const key of Object.keys(CHIP_GROUPS)) builder[key] = checked(`b-${key}`);
+  for (const [key, sel] of Object.entries({ ...SELECTS, ...TEXTS })) builder[key] = $(sel).value;
+  builder.digital = $('#b-digital').checked;
 }
 
-let built = null;
+const builderText = () => builder.custom ?? built.text;
+
 function renderBuilderOutput() {
   built = buildPrompt(builder);
-  $$('#b-extras .chip').forEach((el) => {
+  const format = BUILDER_FORMATS[built.formats[0]];
+  const isDigital = built.formats[0] === 'digital';
+  const form = $('#builder-form');
+
+  // Opcions que no s'apliquen a l'acció o al format triats
+  $$('.chip', form).forEach((el) => {
     el.hidden =
-      (Boolean(el.dataset.only) && el.dataset.only !== builder.action) ||
-      el.dataset.notFormat === builder.format;
+      (el.dataset.only !== undefined && el.dataset.only !== builder.action) ||
+      (el.dataset.activities !== undefined && !format.activities) ||
+      (el.dataset.paper !== undefined && isDigital);
   });
-  renderPromptText($('#b-output'), built.text);
-  const words = built.text.split(/\s+/).filter(Boolean).length;
-  $('#b-words').textContent = `${words} paraules`;
+  $$('.b-section[data-activities]', form).forEach((el) => (el.hidden = !format.activities));
+  $('#b-level-opts').hidden = builder.levels === '1';
+  $('#b-level-mode-hint').hidden = builder.levels === '1';
+  $('#b-level-mode-hint').textContent = LEVEL_MODES.find((m) => m.id === builder.levelMode)?.line ?? '';
+  $('#b-digital-box').hidden = isDigital;
+  $('#b-digital-note').hidden = !isDigital;
+  $('#b-universal-hint').hidden = !builder.profiles.includes(UNIVERSAL_PROFILE.id);
+
+  // Recompte d'opcions actives a cada secció plegable
+  for (const key of Object.keys(CHIP_GROUPS)) {
+    const n = $$(`input[name="b-${key}"]:checked`, form).filter((i) => !i.closest('.chip').hidden).length;
+    const badge = $(`[data-badge="${key}"]`, form);
+    if (badge) badge.textContent = n;
+  }
+  $('[data-badge="levels"]', form).textContent = builder.levels;
+
+  const text = builderText();
+  if (!editingText) renderPromptText($('#b-output'), text);
+  $('#b-custom-note').hidden = builder.custom === null;
+  $('#b-words').textContent = `${text.split(/\s+/).filter(Boolean).length} paraules`;
+}
+
+function setEditingText(on) {
+  editingText = on;
+  const editor = $('#b-editor');
+  const btn = $('#b-edit');
+  if (on) {
+    editor.value = builderText();
+    // Alçada inicial semblant a la del text que substitueix.
+    editor.style.height = `${Math.max($('#b-output').offsetHeight, 320)}px`;
+  }
+  editor.hidden = !on;
+  $('#b-output').hidden = on;
+  btn.setAttribute('aria-pressed', String(on));
+  $('span', btn).textContent = on ? 'Fet' : 'Edita el text';
+  renderBuilderOutput();
+  if (on) editor.focus();
+}
+
+// Substitueix la configuració; demana confirmació si es perdria el text editat.
+function replaceBuilder(next) {
+  if (builder.custom !== null && !confirm('Es perdran els canvis que has fet al text. Vols continuar?')) return;
+  builder = { ...next, custom: null };
+  saveBuilder();
+  syncBuilderForm();
+  if (editingText) $('#b-editor').value = buildPrompt(builder).text;
+  renderBuilderOutput();
+}
+
+function applyPreset(id) {
+  const preset = BUILDER_PRESETS.find((p) => p.id === id);
+  if (!preset) return;
+  const keep = Object.fromEntries(Object.keys(TEXTS).map((k) => [k, builder[k]]));
+  replaceBuilder({ ...builderDefaults(), ...keep, ...preset.config });
+  toast(`Plantilla aplicada: ${preset.label}`);
 }
 
 /* ───────────────────────── Vistes, tema i importació ───────────────────────── */
@@ -696,20 +807,35 @@ function bindEvents() {
     renderBuilderOutput();
   });
   $('#builder-form').addEventListener('submit', (e) => e.preventDefault());
+  $('#b-presets').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-preset]');
+    if (btn) applyPreset(btn.dataset.preset);
+  });
+  $('#b-edit').addEventListener('click', () => setEditingText(!editingText));
+  $('#b-editor').addEventListener('input', (e) => {
+    builder.custom = e.target.value;
+    saveBuilder();
+    renderBuilderOutput();
+  });
+  $('#b-regenerate').addEventListener('click', () => {
+    builder.custom = null;
+    saveBuilder();
+    if (editingText) $('#b-editor').value = built.text;
+    renderBuilderOutput();
+    toast('Text regenerat amb les opcions');
+  });
   $('#b-copy').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
-    if (await copyText(built.text)) {
+    if (await copyText(builderText())) {
       flashButton(btn);
       toast('Copiat. Enganxa’l a la IA.');
     } else toast('No s’ha pogut copiar.');
   });
-  $('#b-save').addEventListener('click', () => openEditor('new', built));
-  $('#b-reset').addEventListener('click', () => {
-    builder = builderDefaults();
-    saveBuilder();
-    syncBuilderForm();
-    renderBuilderOutput();
-  });
+  $('#b-save').addEventListener('click', () => openEditor('new', { ...built, text: builderText() }));
+  $('#b-download').addEventListener('click', () =>
+    download(`${slug(built.title)}.txt`, builderText(), 'text/plain;charset=utf-8'),
+  );
+  $('#b-reset').addEventListener('click', () => replaceBuilder(builderDefaults()));
 
   // Teclat: "/" per anar al cercador de la vista actual
   document.addEventListener('keydown', (e) => {

@@ -19,7 +19,13 @@ per a qualsevol perfil: TEA, TDAH, dislèxia, discalcúlia, TDL, discapacitat in
 - **Copiar amb un clic** des de la targeta o des del detall.
 - **Versió digital interactiva (HTML)**: als prompts on té sentit, un interruptor afegeix la petició d'un únic fitxer HTML amb apunts, activitats autocorrectives, nivells DUA (● ■ ▲) i test final. També hi ha prompts digitals específics (unitat multinivell, test autocorrectiu, joc de repàs, seqüència visual) i el filtre de format «Digital interactiu (HTML)».
 - **Aula**: més de 75 recomanacions basades en l'evidència per fer més inclusius l'espai, les sessions, els materials, l'avaluació, el clima i l'organització. Cada una indica com aplicar-la, per què funciona i la font, amb filtres per àmbit, perfil, nivell de suport (Decret 150/2017), facilitat d'aplicació i solidesa de l'evidència. Pots marcar les que ja apliques i imprimir la llista.
-- **Generador**: combina acció, perfils, format, etapa i opcions, i construeix un prompt estructurat al moment. Inclou el format digital i l'opció de versió digital.
+- **Generador**: construeix al moment un prompt professional i estructurat per seccions (encàrrec, alumnat, DUA, nivells, bastides, activitats, presentació visual, lliurament i autorevisió). Tot és configurable:
+  - **Plantilles** per començar ràpid (fitxa universal DUA, unitat digital multinivell, adaptació ràpida, examen accessible, repte d'ampliació).
+  - **Perfil universal**, que atén tota la diversitat del grup sense etiquetar ningú, combinable amb perfils concrets per reforçar-ne les mesures.
+  - **Principis DUA** (pautes 3.0), **nivells progressius** (1-4, identificats amb símbols, noms o metàfora, en versions paral·leles, escala o menú d'elecció), **bastides** de diversa tipologia, **tipologies d'activitat**, nombre d'activitats i **nivells de Bloom** a treballar.
+  - **Versió del docent** separada: solucionari, guia didàctica, errors previsibles, resum de Bloom (opcional), mapa DUA, criteris i rúbrica, vincle curricular, graella de seguiment i llista de canvis.
+  - **Presentació visual** minimalista (en paper o digital, amb tema clar/fosc i WCAG 2.2) i versió digital opcional.
+  - **Edició lliure del text**: qualsevol part del prompt es pot editar abans de copiar-lo, desar-lo o descarregar-lo.
 - **Prompts propis**: crea, edita, duplica i elimina. Si edites un prompt inclòs, es desa com a versió teva i pots restaurar l'original.
 - **Exportar i importar** en JSON (afegint o substituint).
 - **Tot en local** (`localStorage`): sense comptes, sense servidor, sense seguiment.

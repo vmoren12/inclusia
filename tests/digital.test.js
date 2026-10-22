@@ -42,13 +42,21 @@ test('el marcador digital es conserva en desar prompts d’usuari', () => {
 });
 
 test('generador: format digital i complement digital', () => {
-  const asFormat = buildPrompt({ action: 'crear', format: 'digital', extras: ['digital'] });
+  const asFormat = buildPrompt({ action: 'crear', format: 'digital', digital: true });
   assert.match(asFormat.text, /Format de sortida: material digital interactiu/);
+  assert.match(asFormat.text, /## Especificacions del material digital\n- Un únic fitxer HTML autònom/);
+  assert.match(asFormat.text, /Selector de nivell \(● ■ ▲\)/);
+  assert.match(asFormat.text, /Disseny visual minimalista/);
+  assert.match(asFormat.text, /Vista docent separada/);
+  assert.match(asFormat.text, /Versió del docent \(dins del fitxer, a la vista docent\)/);
   assert.doesNotMatch(asFormat.text, /Versió digital interactiva/, 'no duplica el bloc');
+  assert.doesNotMatch(asFormat.text, /Llest per imprimir|A4/, 'sense opcions només de paper');
   assert.equal(asFormat.digital, false);
 
-  const withAddon = buildPrompt({ action: 'adaptar', format: 'fitxa', extras: ['digital'] });
-  assert.ok(withAddon.text.endsWith(DIGITAL_ADDON));
+  const withAddon = buildPrompt({ action: 'adaptar', format: 'fitxa', digital: true });
+  assert.match(withAddon.text, /## Versió digital interactiva \(a més del material anterior\)\nCrea també el material com a un únic fitxer HTML/);
+  assert.ok(withAddon.text.endsWith('Lliura el codi complet en un sol bloc, sense parts omeses.'));
+  assert.deepEqual(findPlaceholders(withAddon.text).map((f) => f.key), ['etapa i curs']);
   assert.equal(withAddon.digital, false);
 
   assert.equal(buildPrompt({ action: 'adaptar', format: 'fitxa' }).digital, true);

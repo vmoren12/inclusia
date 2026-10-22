@@ -2,7 +2,19 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { BUILTIN_PROMPTS } from '../assets/js/data/prompts.js';
 import { ACTIONS, PROFILES, FORMATS } from '../assets/js/data/taxonomy.js';
-import { BUILDER_FORMATS, BUILDER_PROFILES, BUILDER_EXTRAS } from '../assets/js/data/builder-blocks.js';
+import {
+  BUILDER_FORMATS,
+  BUILDER_PROFILES,
+  DUA_PRINCIPLES,
+  BUILDER_SCAFFOLDS,
+  BUILDER_EXERCISES,
+  BLOOM_LEVELS,
+  BUILDER_TEACHER,
+  BUILDER_VISUAL,
+  BUILDER_QUALITY,
+  BUILDER_PRESETS,
+} from '../assets/js/data/builder-blocks.js';
+import { builderDefaults } from '../assets/js/builder.js';
 import { sanitizePrompt } from '../assets/js/store.js';
 
 const ids = (list) => new Set(list.map((x) => x.id));
@@ -44,5 +56,26 @@ test('cada etiqueta té almenys un prompt', () => {
 test('el generador cobreix tots els perfils i formats', () => {
   for (const p of PROFILES) assert.ok(BUILDER_PROFILES[p.id], `perfil sense blocs: ${p.id}`);
   for (const f of FORMATS) assert.ok(BUILDER_FORMATS[f.id], `format sense blocs: ${f.id}`);
-  assert.equal(new Set(BUILDER_EXTRAS.map((e) => e.id)).size, BUILDER_EXTRAS.length);
+});
+
+test('les opcions del generador tenen ids únics i les plantilles en fan servir de vàlids', () => {
+  const groups = {
+    dua: DUA_PRINCIPLES,
+    scaffolds: BUILDER_SCAFFOLDS,
+    exercises: BUILDER_EXERCISES,
+    bloom: BLOOM_LEVELS,
+    teacher: BUILDER_TEACHER,
+    visual: BUILDER_VISUAL,
+    quality: BUILDER_QUALITY,
+  };
+  for (const [key, list] of Object.entries(groups)) {
+    assert.equal(ids(list).size, list.length, `ids duplicats a ${key}`);
+  }
+  const defaults = builderDefaults();
+  for (const preset of BUILDER_PRESETS) {
+    for (const [key, value] of Object.entries(preset.config)) {
+      assert.ok(key in defaults, `${preset.id}: clau desconeguda «${key}»`);
+      if (groups[key]) for (const v of value) assert.ok(ids(groups[key]).has(v), `${preset.id}: ${key} invàlid «${v}»`);
+    }
+  }
 });

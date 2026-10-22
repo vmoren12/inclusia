@@ -106,11 +106,16 @@
     <section id="view-builder" class="view" aria-labelledby="builder-title" hidden>
       <div class="intro">
         <h1 id="builder-title">Generador de prompts</h1>
-        <p>Combina perfils, format i opcions. El prompt es construeix sol mentre tries.</p>
+        <p>Tria una plantilla o configura cada aspecte. El prompt es construeix sol mentre tries i en pots editar qualsevol part.</p>
       </div>
 
       <div class="builder">
         <form class="builder__form panel" id="builder-form" autocomplete="off">
+          <fieldset class="field">
+            <legend>Comença amb una plantilla <span class="hint">(opcional)</span></legend>
+            <div class="presets" id="b-presets"></div>
+          </fieldset>
+
           <fieldset class="field">
             <legend>Què vols fer</legend>
             <div class="segmented" id="b-action"></div>
@@ -119,6 +124,7 @@
           <fieldset class="field">
             <legend>Perfil de l'alumnat <span class="hint">(pots triar-ne més d'un)</span></legend>
             <div class="chips" id="b-profiles"></div>
+            <p class="hint" id="b-universal-hint" hidden>El perfil universal ja té en compte tota la diversitat. Si hi afegeixes un perfil, se’n reforçaran les mesures específiques.</p>
           </fieldset>
 
           <fieldset class="field">
@@ -138,19 +144,91 @@
             </div>
           </div>
 
-          <div class="field">
-            <label for="b-topic">Tema <span class="hint">(opcional)</span></label>
-            <input id="b-topic" placeholder="Ex.: La cèl·lula">
+          <div class="field-row">
+            <div class="field">
+              <label for="b-topic">Tema <span class="hint">(opcional)</span></label>
+              <input id="b-topic" placeholder="Ex.: La cèl·lula">
+            </div>
+            <div class="field">
+              <label for="b-duration">Durada</label>
+              <select id="b-duration"></select>
+            </div>
           </div>
 
-          <fieldset class="field">
-            <legend>Opcions</legend>
-            <div class="chips" id="b-extras"></div>
-          </fieldset>
-
           <div class="field">
-            <label for="b-notes">Indicació extra <span class="hint">(opcional)</span></label>
-            <input id="b-notes" placeholder="Ex.: Contextualitza els exemples amb el futbol">
+            <label for="b-goal">Objectiu d'aprenentatge <span class="hint">(opcional)</span></label>
+            <input id="b-goal" placeholder="Ex.: Identificar les parts de la cèl·lula i la seva funció">
+          </div>
+
+          <div class="b-sections">
+            <details class="b-section" data-section="dua">
+              <summary>Disseny Universal (DUA) <span class="badge" data-badge="dua"></span></summary>
+              <p class="hint">Principis de les pautes DUA 3.0 (CAST, 2024) que ha d'aplicar el material.</p>
+              <div class="chips" id="b-dua"></div>
+            </details>
+
+            <details class="b-section" data-section="levels" data-activities>
+              <summary>Nivells progressius <span class="badge" data-badge="levels"></span></summary>
+              <div class="field">
+                <span class="field__label" id="b-levels-label">Nombre de nivells</span>
+                <div class="segmented segmented--wrap" id="b-levels" role="radiogroup" aria-labelledby="b-levels-label"></div>
+              </div>
+              <div class="field-row" id="b-level-opts">
+                <div class="field">
+                  <label for="b-level-style">Com s'identifiquen</label>
+                  <select id="b-level-style"></select>
+                </div>
+                <div class="field">
+                  <label for="b-level-mode">Organització</label>
+                  <select id="b-level-mode"></select>
+                </div>
+              </div>
+              <p class="hint" id="b-level-mode-hint"></p>
+            </details>
+
+            <details class="b-section" data-section="scaffolds">
+              <summary>Bastides <span class="badge" data-badge="scaffolds"></span></summary>
+              <p class="hint">Ajudes temporals que permeten fer la tasca i que es retiren a mesura que l'alumne guanya autonomia.</p>
+              <div class="chips" id="b-scaffolds"></div>
+            </details>
+
+            <details class="b-section" data-section="exercises" data-activities>
+              <summary>Activitats i demanda cognitiva <span class="badge" data-badge="exercises"></span></summary>
+              <div class="field">
+                <label for="b-count">Nombre d'activitats</label>
+                <select id="b-count"></select>
+              </div>
+              <fieldset class="field">
+                <legend>Tipologies <span class="hint">(sense cap, la IA les variarà)</span></legend>
+                <div class="chips" id="b-exercises"></div>
+              </fieldset>
+              <fieldset class="field">
+                <legend>Nivells de Bloom a treballar</legend>
+                <div class="chips chips--steps" id="b-bloom"></div>
+              </fieldset>
+            </details>
+
+            <details class="b-section" data-section="teacher">
+              <summary>Versió del docent <span class="badge" data-badge="teacher"></span></summary>
+              <p class="hint">Es lliura separada del material de l'alumne.</p>
+              <div class="chips" id="b-teacher"></div>
+            </details>
+
+            <details class="b-section" data-section="visual">
+              <summary>Presentació visual <span class="badge" data-badge="visual"></span></summary>
+              <div class="chips" id="b-visual"></div>
+              <label class="switch" id="b-digital-box"><input type="checkbox" id="b-digital"><span>Afegeix també una versió digital interactiva (HTML)</span></label>
+              <p class="hint" id="b-digital-note" hidden>El format digital ja inclou un disseny minimalista, tema clar i fosc i accessibilitat WCAG 2.2.</p>
+            </details>
+
+            <details class="b-section" data-section="quality">
+              <summary>Qualitat i indicacions <span class="badge" data-badge="quality"></span></summary>
+              <div class="chips" id="b-quality"></div>
+              <div class="field">
+                <label for="b-notes">Indicació extra <span class="hint">(opcional)</span></label>
+                <textarea id="b-notes" rows="3" placeholder="Ex.: Contextualitza els exemples amb el futbol"></textarea>
+              </div>
+            </details>
           </div>
         </form>
 
@@ -158,14 +236,25 @@
           <div class="output__head">
             <h2>Prompt generat</h2>
             <span class="muted small" id="b-words"></span>
+            <button class="btn btn--ghost" type="button" id="b-edit" aria-pressed="false">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>
+              <span>Edita el text</span>
+            </button>
+          </div>
+          <div class="notice" id="b-custom-note" role="status" hidden>
+            <p><strong>Text editat a mà.</strong> Els canvis d'opcions no s'hi aplicaran fins que el regeneris.</p>
+            <button class="btn btn--link" type="button" id="b-regenerate">Regenera amb les opcions</button>
           </div>
           <pre class="prompt-text" id="b-output" tabindex="0" aria-live="off"></pre>
+          <label class="sr-only" for="b-editor">Text del prompt</label>
+          <textarea class="prompt-text prompt-editor" id="b-editor" spellcheck="true" hidden></textarea>
           <div class="actions">
             <button class="btn btn--primary btn--lg" type="button" id="b-copy">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
               Copia el prompt
             </button>
             <button class="btn" type="button" id="b-save">Desa'l als meus</button>
+            <button class="btn btn--ghost" type="button" id="b-download">Descarrega .txt</button>
             <button class="btn btn--ghost" type="button" id="b-reset">Reinicia</button>
           </div>
         </div>
@@ -239,7 +328,7 @@
         <span aria-hidden="true">·</span>
         <span>Continguts: <a href="https://creativecommons.org/licenses/by/4.0/deed.ca" rel="license noopener">CC BY 4.0</a></span>
         <span aria-hidden="true">·</span>
-        <span><a href="https://github.com/vmoren12/inclusia" title="Codi font a GitHub">v1.2.0</a></span>
+        <span><a href="https://github.com/vmoren12/inclusia" title="Codi font a GitHub">v1.3.0</a></span>
       </p>
       <p class="footer__meta">Pictogrames suggerits: <a href="https://arasaac.org" rel="noopener">ARASAAC</a></p>
     </div>
