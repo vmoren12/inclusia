@@ -19,6 +19,7 @@ per a qualsevol perfil: TEA, TDAH, dislèxia, discalcúlia, TDL, discapacitat in
 - **Copiar amb un clic** des de la targeta o des del detall.
 - **Versió digital interactiva (HTML)**: als prompts on té sentit, un interruptor afegeix la petició d'un únic fitxer HTML amb apunts, activitats autocorrectives, nivells DUA (● ■ ▲) i test final. També hi ha prompts digitals específics (unitat multinivell, test autocorrectiu, joc de repàs, seqüència visual) i el filtre de format «Digital interactiu (HTML)».
 - **Aula**: més de 75 recomanacions basades en l'evidència per fer més inclusius l'espai, les sessions, els materials, l'avaluació, el clima i l'organització. Cada una indica com aplicar-la, per què funciona i la font, amb filtres per àmbit, perfil, nivell de suport (Decret 150/2017), facilitat d'aplicació i solidesa de l'evidència. Pots marcar les que ja apliques i imprimir la llista.
+  - **Guies ràpides per perfil**: un full A4 imprimible (dislèxia, discalcúlia, TDAH, TDL, TEA, discapacitat intel·lectual lleu i altes capacitats) amb les propostes més eficaces per adaptar materials, agrupades en quatre blocs, el nivell d'evidència de cada una (●●● sòlida · ●●○ moderada · ●○○ consens expert), les pràctiques que convé evitar, quatre claus per a l'equip i les referències.
 - **Generador**: construeix al moment un prompt professional i estructurat per seccions (encàrrec, alumnat, DUA, nivells, bastides, activitats, presentació visual, lliurament i autorevisió). Tot és configurable:
   - **Plantilles** per començar ràpid (fitxa universal DUA, unitat digital multinivell, adaptació ràpida, examen accessible, repte d'ampliació).
   - **Perfil universal**, que atén tota la diversitat del grup sense etiquetar ningú, combinable amb perfils concrets per reforçar-ne les mesures.
@@ -56,6 +57,7 @@ index.html                 Estructura de la pàgina
 assets/css/styles.css      Estils (tokens, tema clar/fosc, responsive)
 assets/js/main.js          Interfície i esdeveniments (biblioteca, generador)
 assets/js/aula.js          Secció Aula (recomanacions)
+assets/js/fitxes.js        Guies ràpides A4 per perfil (secció Aula)
 assets/js/utils.js         Utilitats de DOM compartides
 assets/js/store.js         Estat i localStorage (validació de dades)
 assets/js/io.js            Exportació / importació

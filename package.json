@@ -1,6 +1,6 @@
 {
   "name": "inclusia",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Prompts d'IA per crear i adaptar materials educatius inclusius.",
   "type": "module",

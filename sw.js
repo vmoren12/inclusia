@@ -2,7 +2,7 @@
 // Estratègia "network first": sempre la versió més nova si hi ha xarxa; la memòria cau si no n'hi ha.
 // Incrementa VERSION quan canviï la llista de fitxers.
 
-const VERSION = 'v7';
+const VERSION = 'v8';
 const CACHE = `inclusia-${VERSION}`;
 const ASSETS = [
   './',
@@ -11,12 +11,14 @@ const ASSETS = [
   './assets/css/styles.css',
   './assets/js/main.js',
   './assets/js/aula.js',
+  './assets/js/fitxes.js',
   './assets/js/utils.js',
   './assets/js/builder.js',
   './assets/js/io.js',
   './assets/js/placeholders.js',
   './assets/js/store.js',
   './assets/js/data/aula.js',
+  './assets/js/data/fitxes.js',
   './assets/js/data/builder-blocks.js',
   './assets/js/data/digital.js',
   './assets/js/data/prompts.js',

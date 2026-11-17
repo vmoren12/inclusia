@@ -273,6 +273,14 @@
         </div>
       </div>
 
+      <section class="fitxes" aria-labelledby="fitxes-title">
+        <div class="fitxes__head">
+          <h2 id="fitxes-title">Guies ràpides per adaptar materials</h2>
+          <p class="muted">Un full A4 imprimible per perfil amb les propostes més eficaces segons l'evidència, el que convé evitar i les fonts.</p>
+        </div>
+        <ul class="fitxes__list" id="fitxes-list" aria-label="Guies per perfil"></ul>
+      </section>
+
       <div class="library">
         <details class="filters" id="aula-filters" open>
           <summary class="filters__summary">
@@ -441,6 +449,30 @@
     </form>
   </dialog>
 
+  <!-- ───────── DIÀLEG: GUIA RÀPIDA (A4) ───────── -->
+  <dialog class="dialog dialog--sheet" id="dlg-fitxa" aria-labelledby="fitxa-title">
+    <div class="dialog__inner">
+      <header class="dialog__head">
+        <div>
+          <h2 id="fitxa-title">Guia ràpida</h2>
+          <p class="muted">Una pàgina A4 per compartir amb l'equip docent.</p>
+        </div>
+        <button class="btn btn--ghost btn--icon" type="button" data-close title="Tanca">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          <span class="sr-only">Tanca</span>
+        </button>
+      </header>
+      <div class="dialog__body sheet-preview" id="fitxa-sheet" tabindex="0"></div>
+      <footer class="dialog__foot">
+        <button class="btn btn--primary btn--lg" type="button" id="fitxa-print">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg>
+          Imprimeix o desa en PDF
+        </button>
+        <button class="btn btn--ghost" type="button" data-close>Tanca</button>
+      </footer>
+    </div>
+  </dialog>
+
   <!-- ───────── DIÀLEG: COM FUNCIONA ───────── -->
   <dialog class="dialog dialog--sm" id="dlg-about" aria-labelledby="about-title">
     <div class="dialog__inner">
@@ -460,7 +492,7 @@
         </ol>
         <p>Pots <strong>editar</strong> qualsevol prompt, <strong>duplicar-lo</strong> o crear-ne de nous. Tot es desa en aquest navegador: exporta les teves dades per fer-ne una còpia o passar-les a un altre dispositiu.</p>
         <p><strong>Privacitat:</strong> no escriguis mai noms ni dades personals de l'alumnat als prompts.</p>
-        <p>A <strong>Aula</strong> trobaràs recomanacions basades en l'evidència per fer l'aula més inclusiva. Marca les que ja apliques per fer-ne el seguiment.</p>
+        <p>A <strong>Aula</strong> trobaràs recomanacions basades en l'evidència per fer l'aula més inclusiva i <strong>guies ràpides d'una pàgina</strong> per adaptar materials segons el perfil (dislèxia, discalcúlia, TDAH, TDL, TEA, DI lleu, altes capacitats), a punt per imprimir. Marca les mesures que ja apliques per fer-ne el seguiment.</p>
         <p class="muted small">Dreceres de teclat: <kbd>/</kbd> per anar al cercador · <kbd>Esc</kbd> per tancar finestres.</p>
       </div>
     </div>
@@ -468,6 +500,7 @@
 
   <input type="file" id="import-file" accept="application/json,.json" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="print-area" aria-hidden="true"></div>
 
   <noscript><p class="noscript">Inclusia necessita JavaScript per funcionar.</p></noscript>
 </body>

@@ -601,6 +601,110 @@ progress::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
 
 .aula-note { margin-top: 1.25rem; max-width: 60rem; }
 
+/* ---------- Guies ràpides per perfil (A4) ---------- */
+.fitxes {
+  margin: 0 0 1.5rem; padding: 1rem 1.25rem 1.15rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.fitxes__head h2 { font-size: 1.15rem; }
+.fitxes__head p { margin-top: 0.2rem; font-size: 0.95rem; }
+.fitxes__list {
+  list-style: none; margin: 0.85rem 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem;
+}
+.fitxa-btn {
+  width: 100%; height: 100%; display: grid; align-content: start; gap: 0.1rem; text-align: left; cursor: pointer;
+  padding: 0.6rem 0.8rem 0.6rem 2.6rem; position: relative;
+  font: inherit; color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.fitxa-btn::before {
+  content: ''; position: absolute; left: 0.8rem; top: 0.7rem;
+  width: 1.15rem; height: 1.45rem; border-radius: 3px;
+  border: 2px solid var(--accent); background:
+    linear-gradient(var(--accent) 0 0) 50% 32% / 60% 2px no-repeat,
+    linear-gradient(var(--accent) 0 0) 50% 52% / 60% 2px no-repeat,
+    linear-gradient(var(--accent) 0 0) 35% 72% / 30% 2px no-repeat;
+}
+.fitxa-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+.fitxa-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fitxa-btn__label { font-weight: var(--w-semibold); }
+.fitxa-btn__tag { font-size: 0.82rem; color: var(--ink-2); }
+
+.dialog--sheet { width: min(62rem, calc(100% - 2rem)); }
+.sheet-preview { background: var(--surface-2); padding: 1rem; display: block; }
+
+/* El full imita el paper: colors fixos, també amb el tema fosc. */
+.sheet {
+  --s-accent: #1f6b73; --s-accent-soft: #e6f1f1; --s-danger: #a2392d;
+  --s-ink: #1b1f24; --s-ink-2: #59616a; --s-line: #cfd5d8; --s-off: #c9cfd3;
+  --s-warm: #fbf4e2; --s-warm-line: #e3d2a3;
+  width: 100%; max-width: 210mm; margin: 0 auto; padding: 2.2em 2.4em 1.8em;
+  background: #fff; color: var(--s-ink); font-size: 12.5px; line-height: 1.38;
+  border-radius: 6px; box-shadow: 0 2px 14px rgb(0 0 0 / 0.14);
+}
+.sheet h2, .sheet h3, .sheet p, .sheet ul, .sheet ol { margin: 0; }
+.sheet strong { font-weight: var(--w-semibold); }
+.sheet__head {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5em;
+  padding-bottom: 0.6em; border-bottom: 2px solid var(--s-accent);
+}
+.sheet__title { font-size: 1.85em; line-height: 1.12; font-weight: var(--w-semibold); color: var(--s-ink); }
+.sheet__sub { margin-top: 0.3em; color: var(--s-ink-2); font-size: 0.98em; }
+.sheet__legend { display: grid; justify-items: end; gap: 0.1em; font-size: 0.8em; color: var(--s-ink-2); text-align: right; flex-shrink: 0; }
+.sheet__legend > span { display: inline-flex; align-items: center; gap: 0.4em; }
+.sheet__principle {
+  margin-top: 0.8em; padding: 0.6em 0.9em; background: var(--s-accent-soft);
+  border-left: 4px solid var(--s-accent); border-radius: 0 4px 4px 0;
+}
+.sheet__grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.5em; }
+.sheet__sec h3 {
+  margin-top: 0.85em; padding: 0.3em 0.7em; border-radius: 4px 4px 0 0;
+  background: var(--s-accent); color: #fff; font-size: 1em; font-weight: var(--w-semibold);
+}
+.sheet__sec h3 span { font-weight: var(--w-regular); opacity: 0.9; }
+.sheet__sec ul { list-style: none; padding: 0; }
+.sheet__sec li {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 0.8em;
+  padding: 0.34em 0; border-bottom: 1px dashed var(--s-line); break-inside: avoid;
+}
+.sheet cite { font-style: normal; font-size: 0.82em; color: var(--s-ink-2); }
+.sheet__ev { display: inline-flex; gap: 0.18em; flex-shrink: 0; padding-top: 0.4em; }
+.sheet__legend .sheet__ev { padding-top: 0; }
+.sheet__ev i { width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--s-accent); }
+.sheet__ev[data-ev='2'] i:nth-child(3),
+.sheet__ev[data-ev='1'] i:nth-child(n + 2) { background: var(--s-off); }
+.sheet__sec--avoid h3 { background: var(--s-danger); }
+.sheet__sec--avoid ul { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.5em; }
+.sheet__sec--avoid li strong { color: var(--s-danger); }
+.sheet__sec--avoid .sheet__ev i { background: var(--s-danger); }
+.sheet__sec--avoid .sheet__ev[data-ev='2'] i:nth-child(3),
+.sheet__sec--avoid .sheet__ev[data-ev='1'] i:nth-child(n + 2) { background: var(--s-off); }
+.sheet__keys {
+  list-style: none; counter-reset: key; margin-top: 0.9em; padding: 0.7em 0.9em;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1em;
+  background: var(--s-warm); border: 1px solid var(--s-warm-line); border-radius: 5px;
+  font-size: 0.93em; break-inside: avoid;
+}
+.sheet__keys li { counter-increment: key; display: grid; gap: 0.2em; align-content: start; }
+.sheet__keys strong { color: #7a4a00; }
+.sheet__keys strong::before { content: counter(key) '. '; }
+.sheet__refs { margin-top: 0.8em; padding-top: 0.5em; border-top: 1px solid var(--s-line); font-size: 0.74em; color: var(--s-ink-2); line-height: 1.35; }
+.sheet__refs strong { color: var(--s-ink); }
+.sheet__foot { margin-top: 0.4em; font-size: 0.7em; color: var(--s-ink-2); }
+
+#print-area { display: none; }
+
+@media (max-width: 640px) {
+  .sheet { padding: 1.2em 1em; font-size: 12px; }
+  .sheet__head { flex-direction: column; align-items: flex-start; gap: 0.6em; }
+  .sheet__legend { justify-items: start; text-align: left; }
+  .sheet__grid, .sheet__sec--avoid ul { grid-template-columns: 1fr; }
+  .sheet__keys { grid-template-columns: 1fr 1fr; }
+  .sheet-preview { padding: 0.5rem; }
+}
+
 /* ---------- Avisos ---------- */
 .toast {
   position: fixed; left: 50%; bottom: 1.25rem; z-index: 200;
@@ -664,4 +768,15 @@ progress::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
   .rec__details summary { list-style: none; color: #000; }
   .rec__details summary::-webkit-details-marker { display: none; }
   .print-aula .rec__profiles { display: none; }
+  .fitxes { display: none !important; }
+
+  /* Guia ràpida: només el full, en un A4 */
+  body.print-fitxa > :not(#print-area) { display: none !important; }
+  body.print-fitxa #print-area { display: block; page: fitxa; }
+  #print-area .sheet {
+    max-width: none; padding: 0; border-radius: 0; box-shadow: none; font-size: 8.8pt;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
 }
+
+@page fitxa { size: A4 portrait; margin: 9mm 10mm 8mm; }

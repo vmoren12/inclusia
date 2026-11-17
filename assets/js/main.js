@@ -26,6 +26,7 @@ import { buildPrompt, builderDefaults } from './builder.js';
 import { DIGITAL_FORMAT, digitalAddonFor, digitalHintFor, supportsDigitalAddon, withDigitalAddon } from './data/digital.js';
 import { $, $$, esc, matchesQuery, slug, toast, copyText, flashButton, download } from './utils.js';
 import { initAula } from './aula.js';
+import { initFitxes } from './fitxes.js';
 
 /* ───────────────────────── Estat ───────────────────────── */
 
@@ -893,6 +894,7 @@ function init() {
   renderBuilderOutput();
 
   aula = initAula({ getState: () => state, persist });
+  initFitxes();
 
   openFromHash();
   window.addEventListener('hashchange', openFromHash);
