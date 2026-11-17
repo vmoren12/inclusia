@@ -8,7 +8,6 @@ const ids = (list) => new Set(list.map((x) => x.id));
 const emptyFilters = () => ({
   query: '',
   facets: Object.fromEntries(AULA_FACETS.map(({ key }) => [key, new Set()])),
-  status: 'all',
 });
 
 test('les recomanacions tenen ids únics i ASCII', () => {
@@ -40,31 +39,25 @@ test('cada àmbit té recomanacions', () => {
   for (const a of AULA_AREAS) assert.ok(RECOMMENDATIONS.some((r) => r.areas.includes(a.id)), a.id);
 });
 
-test('filtres: facetes combinades, estat i cerca sense accents', () => {
+test('filtres: facetes combinades i cerca sense accents', () => {
   const f = emptyFilters();
-  assert.equal(filterRecommendations(RECOMMENDATIONS, f, new Set()).length, RECOMMENDATIONS.length);
+  assert.equal(filterRecommendations(RECOMMENDATIONS, f).length, RECOMMENDATIONS.length);
 
   f.facets.areas.add('espai');
   f.facets.evidence.add('solida');
-  const list = filterRecommendations(RECOMMENDATIONS, f, new Set());
+  const list = filterRecommendations(RECOMMENDATIONS, f);
   assert.ok(list.length > 0);
   assert.ok(list.every((r) => r.areas.includes('espai') && r.evidence === 'solida'));
 
-  const first = list[0].id;
-  const pending = filterRecommendations(RECOMMENDATIONS, { ...f, status: 'pending' }, new Set([first]));
-  assert.ok(!pending.some((r) => r.id === first));
-  const applied = filterRecommendations(RECOMMENDATIONS, { ...f, status: 'applied' }, new Set([first]));
-  assert.deepEqual(applied.map((r) => r.id), [first]);
-
   const q = emptyFilters();
   q.query = 'SOROLL fons';
-  assert.ok(filterRecommendations(RECOMMENDATIONS, q, new Set()).some((r) => r.id === 'aula-soroll'));
+  assert.ok(filterRecommendations(RECOMMENDATIONS, q).some((r) => r.id === 'aula-soroll'));
 });
 
 test('el tipus «evita» es pot filtrar', () => {
   const f = emptyFilters();
   f.facets.kind.add('evita');
-  const list = filterRecommendations(RECOMMENDATIONS, f, new Set());
+  const list = filterRecommendations(RECOMMENDATIONS, f);
   assert.ok(list.length >= 1);
   assert.ok(list.every((r) => facetValues(r, 'kind')[0] === 'evita'));
 });

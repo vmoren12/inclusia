@@ -563,23 +563,7 @@ textarea { width: 100%; resize: vertical; line-height: 1.55; min-height: 12rem; 
 .prose ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.45rem; }
 
 /* ---------- Aula ---------- */
-.results__bar .progress { display: grid; gap: 0.2rem; font-size: 0.85rem; color: var(--ink-2); min-width: 11rem; }
-progress {
-  appearance: none; width: 100%; height: 0.5rem; border: 0; border-radius: 999px;
-  background: var(--surface-2); overflow: hidden;
-}
-progress::-webkit-progress-bar { background: var(--surface-2); border-radius: 999px; }
-progress::-webkit-progress-value { background: var(--accent); border-radius: 999px; }
-progress::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
-
-/* Variant compacta que ocupa tota l'amplada disponible (columna de filtres) */
-.segmented--sm { display: flex; width: 100%; gap: 0.15rem; }
-.segmented--sm label { flex: 1 1 0; min-width: 0; }
-.segmented--sm span { padding: 0.3rem 0.35rem; font-size: 0.85rem; text-align: center; white-space: nowrap; }
-
 .rec .card__title { font-size: 1.05rem; }
-.rec.is-applied { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
-.rec.is-applied .card__title::before { content: '✓ '; color: var(--accent); }
 .rec__details { border-top: 1px solid var(--line); padding-top: 0.5rem; font-size: 0.95rem; }
 .rec__details summary { cursor: pointer; font-weight: var(--w-semibold); color: var(--accent); width: fit-content; border-radius: 4px; }
 :root:not([data-theme='dark']) .rec__details summary { color: var(--accent-strong); }
@@ -587,9 +571,6 @@ progress::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
 .rec__details p { margin-top: 0.45rem; }
 .rec__source { color: var(--ink-2); font-size: 0.875rem; }
 .rec__profiles .tag { background: transparent; border: 1px solid var(--line); }
-.rec .apply { width: 100%; }
-.rec .apply[aria-pressed='true'] { --btn-bg: var(--accent-soft); --btn-line: var(--accent); --btn-ink: var(--accent-strong); }
-.rec .apply[aria-pressed='false'] .icon { opacity: 0.35; }
 
 .tag--area { background: var(--accent-soft); color: var(--accent-strong); font-weight: var(--w-medium); }
 .tag--evidence { font-weight: var(--w-medium); }
@@ -743,7 +724,6 @@ progress::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
   .topbar__inner { flex-wrap: wrap; row-gap: 0.5rem; }
   .tabs { order: 3; flex: 1 1 100%; }
   .tabs__btn { flex: 1; padding: 0.45rem 0.5rem; }
-  .results__bar .progress { order: 3; flex: 1 1 100%; }
   .topbar .btn--primary { width: 2.5rem; padding: 0; }
   main { padding-inline: 0.75rem; }
   .intro { padding-top: 1.25rem; }

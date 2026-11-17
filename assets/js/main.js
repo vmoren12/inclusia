@@ -594,10 +594,8 @@ async function handleImportFile(file) {
   }
   const n = pendingImport.prompts.length;
   const f = pendingImport.favorites.length;
-  const a = pendingImport.applied.length;
   $('#import-summary').textContent =
-    `El fitxer conté ${n} ${n === 1 ? 'prompt' : 'prompts'}, ${f} ${f === 1 ? 'preferit' : 'preferits'} ` +
-    `i ${a} ${a === 1 ? 'mesura d’aula marcada' : 'mesures d’aula marcades'}.`;
+    `El fitxer conté ${n} ${n === 1 ? 'prompt' : 'prompts'} i ${f} ${f === 1 ? 'preferit' : 'preferits'}.`;
   $('#dlg-import').showModal();
 }
 
@@ -893,7 +891,7 @@ function init() {
   syncBuilderForm();
   renderBuilderOutput();
 
-  aula = initAula({ getState: () => state, persist });
+  aula = initAula();
   initFitxes();
 
   openFromHash();
