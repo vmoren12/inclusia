@@ -2,7 +2,7 @@
 // Estratègia "network first": sempre la versió més nova si hi ha xarxa; la memòria cau si no n'hi ha.
 // Incrementa VERSION quan canviï la llista de fitxers.
 
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = `inclusia-${VERSION}`;
 const ASSETS = [
   './',
@@ -44,7 +44,8 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
   event.respondWith(
-    fetch(request)
+    // «no-cache»: revalida sempre amb el servidor per no barrejar fitxers de versions diferents.
+    fetch(request, { cache: 'no-cache' })
       .then((response) => {
         if (response.ok) {
           const copy = response.clone();

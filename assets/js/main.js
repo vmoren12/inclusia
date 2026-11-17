@@ -891,8 +891,17 @@ function init() {
   syncBuilderForm();
   renderBuilderOutput();
 
-  aula = initAula();
-  initFitxes();
+  // Cada secció s'inicialitza per separat: si una falla, les altres continuen funcionant.
+  try {
+    initFitxes();
+  } catch (err) {
+    console.error(err);
+  }
+  try {
+    aula = initAula();
+  } catch (err) {
+    console.error(err);
+  }
 
   openFromHash();
   window.addEventListener('hashchange', openFromHash);
